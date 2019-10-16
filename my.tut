@@ -1,0 +1,23 @@
+
+
+Deploying to App Engine
+Create an application
+
+To deploy your app, you need to create an app in a region:
+
+    gcloud app create
+
+Note: If you already created an app, you can skip this step.
+Deploying with Cloud Shell
+
+You can use Cloud Shell to deploy your app. To deploy your app enter the following:
+
+    gcloud app deploy
+
+Visit your app
+
+Congratulations! Your app has been deployed. The default URL of your app is a
+subdomain on appspot.com that starts with your project's ID:
+popomap.appspot.com.
+
+Try visiting your deployed application.

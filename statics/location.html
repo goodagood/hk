@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Geolocation</title>
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+        <meta charset="utf-8">
+        <style>
+        /* Always set the map height explicitly to define the size of the div
+         * element that contains the map. */
+        #map {
+            height: 50%;
+            width: 50%;
+        }
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        </style>
+    </head>
+    <body>
+        <div id="slogan">
+            <form method="post" id="SloganForm">
+                <select  id="SloganSelector" name="SloganSelector">
+                    <option value="Free Hong Kong" Selected=selected>Free Hong Kong</option>
+                    <option value="5 Demands, not 1 less">5 demands, not 1 less</option>
+                    <option value="Life, Liberty, Property">Life Liberty Property</option>
+                    <option value="Hong Kong, Uprise!">Hong Kong, uprise</option>
+                    <option value="Dismiss PoPo">Stop police brutality</option>
+                </select>
+            </form>
+        </div>
+        <div id="map"></div>
+        <script>
+
+        // form action
+        //document.forms['SloganForm'].addEventListener('submit', (event) => {
+        document.getElementById("SloganSelector").addEventListener('change', (event) => {
+            event.preventDefault();
+            console.log("event", event);
+
+            var elem = event.srcElement;
+            var text = elem.options[elem.selectedIndex].text;
+            console.log('get text? ', text);
+        });
+
+        const princeEdward = { lat: 22.32478, lng: 114.1683272};
+        const japServer = {lat: 35.6761919, lng: 139.65031059999998};
+
+        // Note: This example requires that you consent to location sharing when
+        // prompted by your browser. If you see the error "The Geolocation service
+        // failed.", it means you probably did not give permission for the browser to
+        // locate you.
+        var map, infoWindow;
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                //center: {lat: -34.397, lng: 150.644},
+                center: princeEdward,
+                zoom: 16
+            });
+            infoWindow = new google.maps.InfoWindow;
+
+            // Try HTML5 geolocation.
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var pos = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    console.log(pos);
+
+                    infoWindow.setPosition(pos);
+                    infoWindow.setContent('Location found.');
+                    infoWindow.open(map);
+
+                    // This change center to browser's pos
+                    map.setCenter(pos);
+                }, function() {
+                    handleLocationError(true, infoWindow, map.getCenter());
+                });
+            } else {
+                // Browser doesn't support Geolocation
+                handleLocationError(false, infoWindow, map.getCenter());
+            }
+        }
+
+        function putInfo(map, pos, text='Empty Text'){
+            infoWindow = new google.maps.InfoWindow;
+            infoWindow.setPosition(pos);
+            infoWindow.setContent(text);
+            infoWindow.open(map);
+        }
+
+        function putTextOnMap(latlng=princeEdward, text="Free Hong Kong") {
+            if(!map) return;
+
+            Popup = createPopupClass();
+            popup = new Popup(
+                      new google.maps.LatLng(latlng),
+                      //document.getElementById('content'));
+                      document.getElementById('content'));
+            popup.setMap(map);
+        }
+
+        function createDiv(text){
+            var div = document.createElement("div");
+            div.innerHTML = text;
+
+            div.style.width = "100px";
+            div.style.height = "100px";
+            div.style.background = "red";
+            div.style.color = "white";
+
+            return div;
+        }
+
+
+
+        function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+            infoWindow.setPosition(pos);
+            infoWindow.setContent(browserHasGeolocation ?
+                'Error: The Geolocation service failed.' :
+                'Error: Your browser doesn\'t support geolocation.');
+            infoWindow.open(map);
+        }
+
+
+        /**
+         * Returns the Popup class.
+         *
+         * Unfortunately, the Popup class can only be defined after
+         * google.maps.OverlayView is defined, when the Maps API is loaded.
+         * This function should be called by initMap.
+         */
+        function createPopupClass() {
+            /**
+             * A customized popup on the map.
+             * @param {!google.maps.LatLng} position
+             * @param {!Element} content The bubble div.
+             * @constructor
+             * @extends {google.maps.OverlayView}
+             */
+            function Popup(position, content) {
+                this.position = position;
+
+                content.classList.add('popup-bubble');
+
+                // This zero-height div is positioned at the bottom of the bubble.
+                var bubbleAnchor = document.createElement('div');
+                bubbleAnchor.classList.add('popup-bubble-anchor');
+                bubbleAnchor.appendChild(content);
+
+                // This zero-height div is positioned at the bottom of the tip.
+                this.containerDiv = document.createElement('div');
+                this.containerDiv.classList.add('popup-container');
+                this.containerDiv.appendChild(bubbleAnchor);
+
+                // Optionally stop clicks, etc., from bubbling up to the map.
+                google.maps.OverlayView.preventMapHitsAndGesturesFrom(this.containerDiv);
+            }
+            // ES5 magic to extend google.maps.OverlayView.
+            Popup.prototype = Object.create(google.maps.OverlayView.prototype);
+
+            /** Called when the popup is added to the map. */
+            Popup.prototype.onAdd = function() {
+                this.getPanes().floatPane.appendChild(this.containerDiv);
+            };
+
+            /** Called when the popup is removed from the map. */
+            Popup.prototype.onRemove = function() {
+                if (this.containerDiv.parentElement) {
+                    this.containerDiv.parentElement.removeChild(this.containerDiv);
+                }
+            };
+
+            /** Called each frame when the popup needs to draw itself. */
+            Popup.prototype.draw = function() {
+                var divPosition = this.getProjection().fromLatLngToDivPixel(this.position);
+
+                // Hide the popup when it is far out of view.
+                var display =
+                    Math.abs(divPosition.x) < 4000 && Math.abs(divPosition.y) < 4000 ?
+                    'block' :
+                    'none';
+
+                if (display === 'block') {
+                    this.containerDiv.style.left = divPosition.x + 'px';
+                    this.containerDiv.style.top = divPosition.y + 'px';
+                }
+                if (this.containerDiv.style.display !== display) {
+                    this.containerDiv.style.display = display;
+                }
+            };
+
+            return Popup;
+        }
+
+
+
+
+        </script>
+        <script async defer
+             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDiwbgt72z6fOBoM0AnngaWBmdtZd_7t-g&callback=initMap">
+        </script>
+    </body>
+</html>
