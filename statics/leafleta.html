@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>HK Leaflet Map Demo</title>
+
+        <!--
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+		<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+        -->
+
+
+         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin=""/>
+
+
+         <!-- Make sure you put this AFTER Leaflet's CSS --> 
+         <script
+        src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+        integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+        crossorigin=""></script>
+
+
+
+
+
+        <style>
+#map {
+    width: 960px;
+    height:500px;
+}
+        </style>
+
+    </head>
+
+    <body>
+
+        <div id="map"></div>
+
+        <script>
+
+const princeEdward = { lat: 22.32478, lng: 114.1683272};
+const aPrinceEdward = [22.32478, 114.16832];
+const peLeft = { lat: 22.33478, lng: 114.1683272};
+
+const hk = {lat: 22.28552, lng: 114.15769};  // Hong Kong
+
+const japServer = {lat: 35.6761919, lng: 139.65031059999998};
+const manhattan = {lat: 40.748  , lng: -73.988  };  // Manhattan
+const toronto = [43.64701, -79.39425];
+
+
+var map = L.map('map',{
+    center: aPrinceEdward,
+    zoom: 10
+});
+
+L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+
+// extra 
+var marker = L.marker(aPrinceEdward).addTo(map);
+
+var dif  = 0.02;
+var poly = [
+        aPrinceEdward,
+        [aPrinceEdward[0]+dif,     aPrinceEdward[1]+dif],
+        [aPrinceEdward[0] + 2*dif, aPrinceEdward[1]+dif]
+    ];
+
+function addcp(center =  aPrinceEdward){
+
+    //var circle = L.circle([22.32, 114.16], {
+    // L.circle fail to get LatLng
+    var circle = L.circleMarker(aPrinceEdward, {
+            color: 'red',
+            fillColor: '#f03',
+            fillOpacity: 0.5,
+            radius: 25
+    }).addTo(map);
+
+    var dif = 0.02;
+
+    var polygon = L.polygon([
+        center,
+        [center[0]+dif, center[1]+dif],
+        [center[0] + 2*dif, center[1]+dif],
+    ]).addTo(map);
+
+    var popup = L.popup()
+        .setLatLng([51.5, -0.09])
+        .setContent("Free Hong Kong.")
+        .openOn(mymap);
+
+    marker.bindPopup("<b>Hello Hong Kong!</b><br>Down with POPO.").openPopup();
+    circle.bindPopup("I am a circle.");
+    polygon.bindPopup("I am a polygon.");
+}
+
+
+
+        </script>
+
+    </body>
+
+</html>
