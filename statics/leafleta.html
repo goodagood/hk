@@ -60,9 +60,9 @@ L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
+//var marker = L.marker(aPrinceEdward).addTo(map);
 
 // extra 
-var marker = L.marker(aPrinceEdward).addTo(map);
 
 var dif  = 0.02;
 var poly = [
@@ -73,7 +73,7 @@ var poly = [
 
 function addcp(center =  aPrinceEdward){
 
-    //var circle = L.circle([22.32, 114.16], {
+    //var circle = L.circle(...)  //failed
     // L.circle fail to get LatLng
     var circle = L.circleMarker(aPrinceEdward, {
             color: 'red',
@@ -100,7 +100,23 @@ function addcp(center =  aPrinceEdward){
     polygon.bindPopup("I am a polygon.");
 }
 
+var umbrella = L.icon({
+        iconUrl: '/svg/umbrella.red.svg',
+        //shadowUrl: 'leaf-shadow.png',
 
+        iconSize:     [38, 95], // size of the icon
+        //shadowSize:   [50, 64], // size of the shadow
+        iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
+        //shadowAnchor: [4, 62],  // the same for the shadow
+        popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+});
+var blackBeast = L.icon({
+        iconUrl: '/svg/black.beast.svg',
+        iconSize:     [64, 64], 
+});
+
+L.marker([aPrinceEdward[0], aPrinceEdward[1] + 0.02 ], {icon: umbrella, draggable:true}).addTo(map).bindPopup("Hong Kong Umbrella.");
+L.marker([aPrinceEdward[0]+0.02, aPrinceEdward[1] ], {icon: blackBeast}).addTo(map).bindPopup("POPO");
 
         </script>
 
