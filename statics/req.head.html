@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>check req head</title>
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+        <meta charset="utf-8">
+        <style>
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #info{padding:20px;}
+        #slogan select{ font-size: 200% }
+        </style>
+    </head>
+    <body>
+        <h1> test req headers </h1>
+        <div id="slogan">
+                <select  id="SloganSelector" name="SloganSelector">
+                    <option value="Free Hong Kong" Selected=selected>Free Hong Kong</option>
+                    <option value="5 Demands, not 1 less">5 demands, not 1 less</option>
+                    <option value="Life, Liberty, Property">Life Liberty Property</option>
+                    <option value="Hong Kong, Uprise!">Hong Kong, uprise</option>
+                    <option value="Dismiss PoPo">STOP police brutality</option>
+                </select>
+        </div>
+        <div id="info"></div>
+
+        <script>
+
+// Note, we indent all js from column 1
+
+// form action
+document.getElementById("SloganSelector").addEventListener('change', (event) => {
+    event.preventDefault();
+    //console.log("event", event);
+
+    var elem = event.srcElement;
+    var text = elem.options[elem.selectedIndex].text;
+    console.log('get text? ', text);
+    //putSelectedInfoOnMap(map, text);
+    // send the information to server
+    postLocation({'one': 1, 'two': [2,2]}, '/hk');
+});
+
+
+function postLocation(data, url='/hk' ){
+    var xhr = new XMLHttpRequest();
+
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                        var jsonReply = JSON.parse(xhr.responseText);
+                        console.log(jsonReply);
+                    }
+    };
+    var json = JSON.stringify(data);
+    console.log('post json data: ', json)
+    xhr.send(json);
+}
+
+
+
+
+        </script>
+    </body>
+</html>

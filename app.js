@@ -1,15 +1,6 @@
-// Copyright 2018, Google LLC.
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//    http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+
+
+
 
 'use strict';
 
@@ -21,13 +12,15 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
-app.use(bodyParser.urlencoded({"extended":true}));
+app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "statics")));
 
 // [START hello_world]
 // Say hello!
 app.get('/', (req, res) => {
-  res.status(200).send('Hello, world! popomap');
+    console.log(req.headers);
+    console.log(JSON.stringify(req.headers));
+    res.status(200).send('Hello, world! popomap');
 });
 // [END hello_world]
 
@@ -35,16 +28,24 @@ app.get('/', (req, res) => {
 app.get('/map', (req, res) => {
     res.sendFile(path.join(__dirname, "statics/mapa.html"));
 });
-app.get('/submit', (req, res) => {
-    res.sendFile(path.join(__dirname, "statics/form1.html"));
+app.get('/hk', (req, res) => {
+    res.sendFile(path.join(__dirname, "statics/hk.html"));
 });
-app.post('/submit', (req, res) => {
-    console.log({
-        name: req.body.name,
-        msg:  req.body.message
-    });
-    res.send("msg console logged");
+app.post('/hk', (req, res) => {
+
+    console.log(req.body);
+    console.log(req.headers);
+    console.log("going to response with a json.");
+
+    res.writeHead(200, {"Content-Type": "application/json"});
+
+    var reply = [];
+    if (req.body.location){ reply.push('location') };
+    if (req.body.headers){ reply.push('headers') };
+    var json = JSON.stringify(reply);
+    res.end(json);
 });
+
 
 if (module === require.main) {
   // [START server]
