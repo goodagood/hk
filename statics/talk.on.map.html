@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Talk on map, test</title>
+        <!-- let people talk on map, the backend should be /talkmap
+             but we use /hk now
+        -->
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+        <meta charset="utf-8">
+        <style>
+        #message {
+                margin: auto;
+                padding: 10px;
+        }
+        #message input{ font-size: 200% }
+
+        /* Always set the map height explicitly to define the size of the div
+         * element that contains the map. */
+        #map {
+            height: 90%;
+            width: 90%;
+        }
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        </style>
+    </head>
+    <body>
+        <div id="message">
+            <input type="text" name="textBox" id="textBox" />
+            <input type="submit" id="addMsg2Map" value="GoGoGo FreeHK" />
+        </div>
+
+        <div id="map"></div>
+        <script>
+
+const princeEdward = { lat: 22.32478, lng: 114.1683272};
+const japServer = {lat: 35.6761919, lng: 139.65031059999998};
+
+// Note: This example requires that you consent to location sharing when
+// prompted by your browser. If you see the error "The Geolocation service
+// failed.", it means you probably did not give permission for the browser to
+// locate you.
+var map, infoWindow, Latlng;
+function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+        //center: {lat: -34.397, lng: 150.644},
+        //center: princeEdward,
+        center: japServer,
+        zoom: 6
+    });
+    infoWindow = new google.maps.InfoWindow; // make a top level var
+
+    getLatlng(function(err, pos){
+        if(err) {console.log(err); return;}
+
+        console.log('got pos in init map: ', pos);
+        putInfo(map, pos, 'sir this way!');
+
+        // This change center to browser's pos
+        map.setCenter(pos);
+    });
+}
+
+function putInfo(map, pos, text='Empty Text'){
+    if(!infoWindow) infoWindow = new google.maps.InfoWindow;
+
+    infoWindow.setPosition(pos);
+    infoWindow.setContent(text);
+    infoWindow.open(map);
+    return;
+}
+
+function getLatlng(cb){
+    // Try HTML5 geolocation.
+    if(Latlng) { return cb(null, Latlng); }
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            var pos = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            };
+            Latlng = pos;
+            console.log(pos);
+
+            return cb(null, pos);
+
+            //putInfo(map, pos, text);
+            // This change center to browser's pos
+            //map.setCenter(pos);
+        }, function() {
+            handleLocationError(true, infoWindow, map.getCenter());
+        });
+    } else {
+        // Browser doesn't support Geolocation
+        handleLocationError(false, infoWindow, map.getCenter());
+    }
+}
+
+function putMessageOnMap(map, text, cb){
+    if(!map) return (console.log('no map in putMessageOnMap'));
+
+    // to be replaced by getLatlng
+    getLatlng(function(err, pos){
+        if(err){return console.log('putSe.. err');}
+
+        console.log('put a message on map');
+        putInfo(map, pos, text);
+
+        // This change center to browser's pos
+        map.setCenter(pos);
+
+        if(!cb){return;}
+        cb(null, pos);
+    });
+}
+
+// form action
+document.getElementById("addMsg2Map").addEventListener('click', (event) => {
+    event.preventDefault();
+    console.log("got event", event);
+
+    var text = document.getElementById("textBox").value;
+
+    console.log('get text? ', text);
+    putMessageOnMap(map, text, function(err, pos){
+        postLocation({'location':pos, 'message':text});
+    });
+});
+
+function postLocation(data, url='/hk' ){
+    var xhr = new XMLHttpRequest();
+
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                        var jsonReply = JSON.parse(xhr.responseText);
+                        console.log(jsonReply);
+                    }
+    };
+    var json = JSON.stringify(data);
+    console.log('post json data: ', json)
+    xhr.send(json);
+}
+
+
+function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+    infoWindow.setPosition(pos);
+    infoWindow.setContent(browserHasGeolocation ?
+        'Error: The Geolocation service failed.' :
+        'Error: Your browser doesn\'t support geolocation.');
+    infoWindow.open(map);
+}
+
+
+        </script>
+        <script async defer
+             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDiwbgt72z6fOBoM0AnngaWBmdtZd_7t-g&callback=initMap">
+        </script>
+    </body>
+</html>
