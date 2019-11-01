@@ -104,14 +104,13 @@ function getLatlng(cb){
 function putMessageOnMap(map, text, cb){
     if(!map) return (console.log('no map in putMessageOnMap'));
 
-    // to be replaced by getLatlng
     getLatlng(function(err, pos){
         if(err){return console.log('putSe.. err');}
 
         console.log('put a message on map');
         putInfo(map, pos, text);
 
-        // This change center to browser's pos
+        // This change MAP center to browser's pos
         map.setCenter(pos);
 
         if(!cb){return;}
