@@ -1,0 +1,183 @@
+
+$default-color: black;
+$default-background-color: white;
+
+/*
+background-color: #becae3;
+color: #333333;
+
+mobile first means: change setting for big width later
+*/
+
+
+body {
+    margin:1px;
+    margin-top: 2px;
+    padding:2px;
+
+    color: $default-color;
+    background-color: $default-background-color;
+
+    font: 16px/1em 'PT Sans', sans-serif;
+
+    text-align: center;
+    line-height: 1.5rem;
+
+    display: block;
+
+    border-left: 2px solid green;
+    border-right: 2px solid green;
+    border-radius: 3px;
+
+
+    // centralize
+    #ooowrapper ,
+    .container  {
+        line-height:140%;
+
+        max-width:88rem;
+
+        margin-left:auto;
+        margin-right:auto;
+    }
+}
+
+
+nav{
+    // switch color:
+    color: $default-background-color;
+    background-color: $default-color;
+
+    display: block;
+
+    z-index: 100;
+
+    padding-top: 0.8rem;
+    padding-bottom: 0.8rem;
+
+    div {
+        /*float: right;*/
+
+        a {
+            margin-right:0.9rem;
+            min-width: 5rem;
+            padding: 1px;
+
+            border-radius: 4px;
+            border-style: solid;
+            border-width: 1px;
+            //border-color: $default-background-color;
+            border-color: #999;
+
+            text-decoration: none;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+    }
+
+
+}
+
+
+
+
+
+
+
+@media screen and (min-width: 640px) {
+
+}
+
+
+nav a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+
+
+.container { max-width: 1280px; }
+//.container { max-width: 88rem; }
+
+div#ooowrapper {
+  position: relative;
+  //margin: 0.5rem auto;
+
+  /* for fix top? */
+  margin-top: 4rem; 
+
+  width: 98%;
+  text-align: left;
+}
+
+ 
+/*footer
+ *
+    background-color: #dcdee3;
+ */
+ 
+footer {
+    color: #000;
+    font-family: 'PT Serif', serif;
+    font-style: italic;
+    text-align: center;
+    font-size: 14px;
+
+    padding-top: 10px;
+
+    border-radius: 5px;
+}
+
+
+@media only screen and (min-width: 768px) {
+
+
+
+}
+
+
+@media only screen and (max-width: 480px) {
+
+
+}
+
+
+
+/*tools*/
+
+.clr { clear:both; }
+
+/*shorter clearfix http://nicolasgallagher.com/micro-clearfix-hack/*/
+.clear-fix:before,
+.clear-fix:after {
+    content:" ";
+    display:table;
+}
+ 
+.clear-fix:after {
+    clear:both;
+}
+ 
+/* For IE 6/7 (trigger hasLayout) */
+.clear-fix {
+    zoom:1;
+}
+
+
+.full-width {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+
+  overflow:hidden;
+  height:100px;
+}
+

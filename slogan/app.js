@@ -1,0 +1,39 @@
+
+const http = require('http');
+const fs = require('fs');
+
+const express = require('express');
+
+const hostname = '127.0.0.1';
+const port = 8080;
+
+// primary HTTP server
+var server = http.createServer((req, res) => {
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'text/plain');
+  res.end('Hello World\n');
+});
+//server.listen(port, hostname, () => {
+//  console.log(`Server running at http://${hostname}:${port}/`);
+//});
+
+//serve static file with bare node.js
+//http.createServer(function (req, res) {
+//  fs.readFile(__dirname + req.url, function (err,data) {
+//    if (err) {
+//      res.writeHead(404);
+//      res.end(JSON.stringify(err));
+//      return;
+//    }
+//    res.writeHead(200);
+//    res.end(data);
+//  });
+//});
+
+const app = express();
+
+app.use(express.static('./')); //serve all file in current folder
+
+app.get('/', (req, res) => res.send('Hello All files!'));
+
+app.listen(port, () => console.log(`Example app listening on port ${port}!`));

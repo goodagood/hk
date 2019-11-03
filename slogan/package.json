@@ -1,0 +1,30 @@
+{
+  "name": "slogan",
+  "version": "1.0.0",
+  "description": "build every thing into single html file",
+  "repository": "https://github.com/goodagood/hk",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js",
+    "test":  "nodemon app.js"
+  },
+  "keywords": [
+    "slogan",
+    "single",
+    "file",
+    "html"
+  ],
+  "author": "andrew",
+  "license": "ISC",
+  "dependencies": {
+    "browserify": "^16.5.0",
+    "color": "^3.1.2",
+    "cookie": "^0.4.0",
+    "http-server": "^0.11.1",
+    "node-sass": "^4.13.0"
+  },
+  "devDependencies": {
+    "express": "^4.17.1",
+    "inliner": "^1.13.1"
+  }
+}

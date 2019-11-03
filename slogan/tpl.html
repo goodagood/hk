@@ -1,0 +1,244 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<!-- 
+  As temperory testing for ui styling and login page. 0203, 2015
+  Finally, each page got more and more re-writing.    0201, 2016
+-->
+<head>
+<meta http-equiv="content-type" content="text/html" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="description" content="index, goodogood/goodagood" />
+<meta name="keywords" content="goodogood, goodagood, filesystem, sharing" />
+<meta name="author"   content="Andrew">
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+
+<link rel="stylesheet" href="{{htmlRoot}}/node_modules/normalize.css/normalize.css">
+
+
+<link rel="stylesheet" type="text/css" href="{{htmlRoot}}/styles/index.css" >
+
+<!--
+<link rel="stylesheet" href="/blueimp-gallery/css/blueimp-gallery.min.css">
+<link rel="stylesheet" href="{{htmlRoot}}/node_modules/skeleton-css/css/skeleton.css">
+<link rel="stylesheet" href="{{htmlRoot}}/node_modules/font-awesome/css/font-awesome.min.css">
+
+<link rel="stylesheet" href="stylesheets/login.css">
+--> 
+
+<style type="text/css">
+.full-width {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+
+  overflow:hidden;
+  height:100px;
+}
+
+    div#markdown p {
+      line-height: 150%;
+    }
+</style>
+
+
+<!--
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+// google adsense block, but it not works, 2017 1109
+(adsbygoogle = window.adsbygoogle || []).push({
+  google_ad_client: "ca-pub-5882915496649565",
+  enable_page_level_ads: true
+});
+</script>
+-->
+
+
+<title> 
+    md template goodogood
+</title>
+
+<!--
+<link rel="stylesheet" href="/static/bower_components/bootstrap/dist/css/bootstrap-glyphicons.css">
+-->
+
+</head>
+
+
+<body>
+
+
+<nav id="fix-top">
+  <div class="logo">
+      <a href="/" class="ggcom">goodogood</a>
+  </div>
+  <div class="topnav" id="w3topnav">
+    <a href="javascript:void(0)" id="randomColor">Color</a>
+    <a href="javascript:void(0)" id="textColor" class="opt">Text color</a>
+
+    <a href="javascript:void(0)"
+       id="increaseBodyFontSizeNavItem"
+      > Z+ </a>
+
+    <a href="javascript:void(0)"
+       id="decreaseBodyFontSizeNavItem"
+      > z- </a>
+
+  </div>
+</nav>
+
+
+
+
+
+<div id="wrapper" class="container">
+
+
+
+
+  <!--
+    markdown begin
+  -->
+  <div id="markdown">
+
+    {{{ html4markdown }}}
+
+  </div>
+  <!--
+    markdown end
+  -->
+
+
+  <footer>
+    <div>
+      goodogood, goodagood, Andrew, &copy; 2015(6,7,8,9) <br />
+      <span id="colorInfo"> </span>
+    </div>
+
+    <div>
+
+      <a href="https://github.com/goodagood/gg2"
+        class="button" target="_blank"> 
+        Codes </a>
+
+      <a href="https://github.com/goodagood/chimp.land/blob/master/001.txt"  
+        class="button" target="_blank"> 
+        Chimp's Land 猩猩国度 </a>
+
+
+      <a href="/static/gg.intro/md.html" class="button"> Introductions </a>
+      <a href="/my.md/index.html" class="button"> Intro. </a>
+      <a href="https://github.com/goodagood/story/blob/master/y10m/a.markdown"  
+        class="button" target="_blank"> 
+        一粒沙子</a>
+
+      <a href="https://github.com/goodagood/story/blob/master/y10m/b.markdown"  
+        class="button" target="_blank"> 
+        Editing Version</a>
+    </div>
+
+    <div id="end"> END </div>
+  </footer>
+
+
+
+
+</div> <!-- end of wrapper -->
+
+<!--
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script src="http://code.jquery.com/jquery.min.js"></script>
+<script src="/static/js/jquery.inspect.js"></script>
+-->
+
+
+<script src="{{htmlRoot}}/node_modules/jquery/dist/jquery.min.js"></script>
+<!--  <script src="/static/js/i18next-1.7.3.js"></script>  
+<script src="/static/bower_components/i18next/i18next.min.js"></script>
+<script src="/static/js/text-trans.js"></script>
+<script src="/js/text-trans.js"></script>
+
+<script src="/blueimp-gallery/js/blueimp-gallery.min.js"></script>
+-->
+
+<script src="{{htmlRoot}}/bundle.js"></script>
+
+
+<script>
+const p = console.log;
+
+///*
+//function getBodyFontSize(){
+//  var fs = document.body.style.fontSize;
+//  if (fs && fs !== ""){
+//    return fs;
+//  }
+//  return window.getComputedStyle(document.body).fontSize;
+//}
+//
+//function increaseBodyFontSize(e){
+//  e.preventDefault();
+//  var size = getBodyFontSize();
+//  intSize  = parseInt(size);
+//  p(`size: ${size}, `);
+//  big = intSize + 1;
+//  p(`size + 1: ${big}, `);
+//  document.body.style.fontSize = `${big}px`;
+//}
+//function decreaseBodyFontSize(e){
+//  e.preventDefault();
+//  var size = getBodyFontSize();
+//  intSize  = parseInt(size);
+//  p(`size: ${size}, `);
+//  small = intSize - 1;
+//  p(`size - 1: ${small}, `);
+//  document.body.style.fontSize = `${small}px`;
+//}
+//
+//*/
+
+//(function(){
+//  var el = document.getElementById("increaseBodyFontSizeNavItem");
+//  if (el.addEventListener){
+//    el.addEventListener("click", increaseBodyFontSize, false);
+//  }else if (el.attachEvent){
+//    el.attachEvent('onclick', increaseBodyFontSize);
+//  }
+//
+//  var decreaseEl = document.getElementById("decreaseBodyFontSizeNavItem");
+//  if (decreaseEl.addEventListener){
+//    decreaseEl.addEventListener("click", decreaseBodyFontSize, false);
+//  }else if (decreaseEl.attachEvent){
+//    decreaseEl.attachEvent('onclick', decreaseBodyFontSize);
+//  }
+//})();
+
+</script>
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+-->
+
+<!--[if lt IE 9]>
+<script src="/static/bower_components/html5shiv/dist/html5shiv.min.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+<![endif]-->
+
+<!--% if(typeof script != 'undefined' && script) print(script); %-->
+
+</body>
+<!-- vim: et ts=2 sw=2 tw=150
+-->
+</html>
+
+

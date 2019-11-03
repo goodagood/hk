@@ -1,0 +1,173 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<!-- 
+  Enter slogans and set color and size
+-->
+<head>
+<meta http-equiv="content-type" content="text/html" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="description" content="index, goodogood/goodagood" />
+<meta name="keywords" content="goodogood, goodagood, filesystem, sharing" />
+<meta name="author"   content="Andrew">
+
+
+<link rel="shortcut icon" type="image/x-icon" href="./favicon.ico" />
+
+<link rel="stylesheet" type="text/css" href="./single.css" >
+
+
+<style type="text/css">
+form #textInput{
+  min-width:60%;
+  font-size:24px;
+}
+
+#slogan {
+  margin-top: 18px;
+}
+</style>
+
+
+<!--
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+-->
+
+
+<title> 
+    Color and Size
+</title>
+
+
+</head>
+
+<body>
+
+
+<nav id="ooofix-top">
+  <div class="topnav" id="control-color-size">
+    <a href="." id="randomColor">Color</a>
+    <a href="." id="textColor" class="opt">Text</a>
+    <a href="." id="increaseBodyFontSize" > Z++ </a>
+    <a href="." id="decreaseBodyFontSize" > z-- </a>
+  </div>
+</nav>
+
+
+
+<div id="wrapper" >
+
+  <br class="clear-fix" />
+  <form>
+      <input type="text" id="textInput" 
+       placeholder="POPO eats dog food" onfocus="this.placeholder=''" />
+      <input type=SUBMIT value=YES id="yes" />
+  </form>
+  <br class="clear-fix" />
+
+  <div id="slogan" >
+    <p> 5 Demands, Not 1 Less </p>
+    <p> POPO GO HELL       </p>
+    <p> 仗义多为屠狗辈 </p>
+    <p> 仗義多為屠狗輩 </p>
+    <p> POPO 愛 校长 </p>
+    <p> Senates kowtow CCP </p>
+    <p> DLLM Sir, POPO Smile! </p>
+    <p> Fight for freedom, Stand with Hong Kong </p>
+  </div>
+
+</div> <!-- end of wrapper -->
+
+<div class="clear-fix"></div>
+<footer>
+  <div class="full-width">
+    goodogood, goodagood, Andrew, &copy; 2019 2020 <br />
+  </div>
+  <div id="debugInfo"> </div>
+</footer>
+
+
+<script src="./single.js"></script>
+<script >
+// DO TESTING
+const p = console.log;
+
+// -- Font Size
+
+function getBodyFontSize(){
+  var fs = document.body.style.fontSize;
+  if (fs && fs !== ""){
+    return fs;
+  }
+  return window.getComputedStyle(document.body).fontSize;
+}
+
+
+function increaseBodyFontSize(e){
+  e.preventDefault();
+  var size = getBodyFontSize();
+  intSize  = parseInt(size);
+  p(`size: ${size}, `);
+  big = intSize + 1;
+  p(`size + 1: ${big}, `);
+  document.body.style.fontSize = `${big}px`;
+}
+function decreaseBodyFontSize(e){
+  e.preventDefault();
+  var size = getBodyFontSize();
+  intSize  = parseInt(size);
+  p(`size: ${size}, `);
+  small = intSize - 1;
+  p(`size - 1: ${small}, `);
+  document.body.style.fontSize = `${small}px`;
+}
+
+var increaseEl = document.getElementById("increaseBodyFontSize");
+if (increaseEl.addEventListener){
+    increaseEl.addEventListener("click", increaseBodyFontSize, false);
+}else if (increaseEl.attachEvent){
+    increaseEl.attachEvent('onclick', increaseBodyFontSize);
+}
+
+var decreaseEl = document.getElementById("decreaseBodyFontSize");
+if (decreaseEl.addEventListener){
+    decreaseEl.addEventListener("click", decreaseBodyFontSize, false);
+}else if (decreaseEl.attachEvent){
+    decreaseEl.attachEvent('onclick', decreaseBodyFontSize);
+}
+
+
+// Body Color
+
+
+textel = document.getElementById('textInput');
+yes = document.getElementById('yes');
+slogan = document.getElementById('slogan');
+
+document.getElementById('yes').onclick = function(e){
+    if(e) e.preventDefault();
+
+    const text = textel.value || " ";
+    p(textel.value);
+
+    var paragraph = document.createElement("p");
+    var textnode = document.createTextNode(text);
+    paragraph.appendChild(textnode);
+
+    slogan.insertBefore(paragraph, slogan.firstChild);
+
+    p('yes clicked');
+};
+
+</script>
+
+
+</body>
+<!-- 
+  vim: et ts=2 sw=2 tw=150
+-->
+</html>
+
+
