@@ -34,6 +34,8 @@ nav {
   nav div {
     /*float: right;*/ }
     nav div a {
+      color: black;
+      background-color: white;
       margin-right: 0.9rem;
       min-width: 5rem;
       padding: 1px;

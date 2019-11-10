@@ -28,6 +28,18 @@ function bodyColor(foreground,background){
 }
 
 
+function divColor(divid, foreground,background){
+    if(!divid) return false;
+
+    foreground = foreground || BLACK;
+    background = background || WHITE;
+
+    var el = document.getElementById(divid);
+    el.style.color = foreground;
+    el.style.backgroundColor = background;
+}
+
+
 function randomColor(){
     return Color.rgb(
         parseInt(Math.random()*256),
@@ -62,13 +74,19 @@ function randomHexColorPair(){
 
 
 function randomBodyColor(){
-    const r = 4.5;
-
     [fore, back] = randomHexColorPair();
     //console.log(fore.toString(), back.toString(), 'hex: ', fore.hex(), back.hex());
-    console.log(fore.toString(), back.toString(), );
+    //console.log(fore.toString(), back.toString(), );
 
     bodyColor(fore, back);
+}
+
+function randomDivColor(divid){
+    if(!divid) return false;
+
+    [fore, back] = randomHexColorPair();
+
+    divColor(divid, fore, back);
 }
 
 function rollBodyForeground(){
@@ -103,11 +121,13 @@ function rollBodyForeground(){
 //window.randomBodyColor = randomBodyColor;
 
 
-//colorDefault();
-
 module.exports.bodyColor = bodyColor;
 module.exports.randomBodyColor = randomBodyColor;
 module.exports.rollBodyForeground = rollBodyForeground;
+module.exports.randomDivColor = randomDivColor;
+
+//debug
+window.randomDivColor = randomDivColor;
 
 },{"./cookie.js":2,"color":8}],2:[function(require,module,exports){
 
@@ -2119,17 +2139,12 @@ swizzle.wrap = function (fn) {
 },{"is-arrayish":9}],11:[function(require,module,exports){
 
 const pcolor = require("./color.js");
-//const coo = require("./cookie.js");
 
 const p = console.log;
 
-window.pcolor = pcolor;
-window.two = 2;
-
-//const randomBodyColor = pcolor.randomBodyColor;
-//const rollBodyForeground = pcolor.rollBodyForeground;
 
 // Hook up functions to page elements
+// Color and Text Color:
 document.getElementById('randomColor').onclick = function(e){
     if(e) e.preventDefault();
     pcolor.randomBodyColor();
@@ -2145,13 +2160,68 @@ document.getElementById('textColor').onclick = function(e){
  * Do body font size
  */
 
+function getBodyFontSize(){
+  var fs = document.body.style.fontSize;
+  if (fs && fs !== ""){
+    return fs;
+  }
+  return window.getComputedStyle(document.body).fontSize;
+}
+
+
+function increaseBodyFontSize(e){
+  e.preventDefault();
+  var size = getBodyFontSize();
+  intSize  = parseInt(size);
+  //p(`size: ${size}, `);
+  big = intSize + 1;
+  //p(`size + 1: ${big}, `);
+  document.body.style.fontSize = `${big}px`;
+}
+function decreaseBodyFontSize(e){
+  e.preventDefault();
+  var size = getBodyFontSize();
+  intSize  = parseInt(size);
+  //p(`size: ${size}, `);
+  small = intSize - 1;
+  //p(`size - 1: ${small}, `);
+  document.body.style.fontSize = `${small}px`;
+}
+
+var increaseEl = document.getElementById("increaseBodyFontSize");
+if (increaseEl.addEventListener){
+    increaseEl.addEventListener("click", increaseBodyFontSize, false);
+}else if (increaseEl.attachEvent){
+    increaseEl.attachEvent('onclick', increaseBodyFontSize);
+}
+
+var decreaseEl = document.getElementById("decreaseBodyFontSize");
+if (decreaseEl.addEventListener){
+    decreaseEl.addEventListener("click", decreaseBodyFontSize, false);
+}else if (decreaseEl.attachEvent){
+    decreaseEl.attachEvent('onclick', decreaseBodyFontSize);
+}
+
+
+// Body Color
+
 
 
 document.getElementById('yes').onclick = function(e){
     if(e) e.preventDefault();
-    p('yes clicked');
 
+    var textel = document.getElementById('textInput');
+    const text = textel.value || " ";
+    p(textel.value);
+
+    var paragraph = document.createElement("p");
+    var textnode = document.createTextNode(text);
+    paragraph.appendChild(textnode);
+
+    var slogan = document.getElementById('slogan');
+    slogan.insertBefore(paragraph, slogan.firstChild);
 };
+
 
 
 },{"./color.js":1}]},{},[11]);

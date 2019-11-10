@@ -27,6 +27,18 @@ function bodyColor(foreground,background){
 }
 
 
+function divColor(divid, foreground,background){
+    if(!divid) return false;
+
+    foreground = foreground || BLACK;
+    background = background || WHITE;
+
+    var el = document.getElementById(divid);
+    el.style.color = foreground;
+    el.style.backgroundColor = background;
+}
+
+
 function randomColor(){
     return Color.rgb(
         parseInt(Math.random()*256),
@@ -61,13 +73,19 @@ function randomHexColorPair(){
 
 
 function randomBodyColor(){
-    const r = 4.5;
-
     [fore, back] = randomHexColorPair();
     //console.log(fore.toString(), back.toString(), 'hex: ', fore.hex(), back.hex());
-    console.log(fore.toString(), back.toString(), );
+    //console.log(fore.toString(), back.toString(), );
 
     bodyColor(fore, back);
+}
+
+function randomDivColor(divid){
+    if(!divid) return false;
+
+    [fore, back] = randomHexColorPair();
+
+    divColor(divid, fore, back);
 }
 
 function rollBodyForeground(){
@@ -102,8 +120,10 @@ function rollBodyForeground(){
 //window.randomBodyColor = randomBodyColor;
 
 
-//colorDefault();
-
 module.exports.bodyColor = bodyColor;
 module.exports.randomBodyColor = randomBodyColor;
 module.exports.rollBodyForeground = rollBodyForeground;
+module.exports.randomDivColor = randomDivColor;
+
+//debug
+window.randomDivColor = randomDivColor;

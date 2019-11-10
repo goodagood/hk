@@ -20,8 +20,12 @@
 
 
 <style type="text/css">
+form {
+  /*background-color: #F5F5F5;*/
+  font-size:24px;
+}
 form #textInput{
-  min-width:60%;
+  min-width:65%;
   font-size:24px;
 }
 
@@ -72,7 +76,7 @@ form #textInput{
     <p> POPO GO HELL       </p>
     <p> 仗义多为屠狗辈 </p>
     <p> 仗義多為屠狗輩 </p>
-    <p> POPO 愛 校长 </p>
+    <p> POPO 愛 校長 </p>
     <p> Senates kowtow CCP </p>
     <p> DLLM Sir, POPO Smile! </p>
     <p> Fight for freedom, Stand with Hong Kong </p>
@@ -96,70 +100,6 @@ const p = console.log;
 
 // -- Font Size
 
-function getBodyFontSize(){
-  var fs = document.body.style.fontSize;
-  if (fs && fs !== ""){
-    return fs;
-  }
-  return window.getComputedStyle(document.body).fontSize;
-}
-
-
-function increaseBodyFontSize(e){
-  e.preventDefault();
-  var size = getBodyFontSize();
-  intSize  = parseInt(size);
-  p(`size: ${size}, `);
-  big = intSize + 1;
-  p(`size + 1: ${big}, `);
-  document.body.style.fontSize = `${big}px`;
-}
-function decreaseBodyFontSize(e){
-  e.preventDefault();
-  var size = getBodyFontSize();
-  intSize  = parseInt(size);
-  p(`size: ${size}, `);
-  small = intSize - 1;
-  p(`size - 1: ${small}, `);
-  document.body.style.fontSize = `${small}px`;
-}
-
-var increaseEl = document.getElementById("increaseBodyFontSize");
-if (increaseEl.addEventListener){
-    increaseEl.addEventListener("click", increaseBodyFontSize, false);
-}else if (increaseEl.attachEvent){
-    increaseEl.attachEvent('onclick', increaseBodyFontSize);
-}
-
-var decreaseEl = document.getElementById("decreaseBodyFontSize");
-if (decreaseEl.addEventListener){
-    decreaseEl.addEventListener("click", decreaseBodyFontSize, false);
-}else if (decreaseEl.attachEvent){
-    decreaseEl.attachEvent('onclick', decreaseBodyFontSize);
-}
-
-
-// Body Color
-
-
-textel = document.getElementById('textInput');
-yes = document.getElementById('yes');
-slogan = document.getElementById('slogan');
-
-document.getElementById('yes').onclick = function(e){
-    if(e) e.preventDefault();
-
-    const text = textel.value || " ";
-    p(textel.value);
-
-    var paragraph = document.createElement("p");
-    var textnode = document.createTextNode(text);
-    paragraph.appendChild(textnode);
-
-    slogan.insertBefore(paragraph, slogan.firstChild);
-
-    p('yes clicked');
-};
 
 </script>
 

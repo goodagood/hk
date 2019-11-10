@@ -59,6 +59,9 @@ nav{
         /*float: right;*/
 
         a {
+            color: $default-color;
+            background-color: $default-background-color;
+
             margin-right:0.9rem;
             min-width: 5rem;
             padding: 1px;
