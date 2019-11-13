@@ -2,10 +2,10 @@
 var cryptico = require('cryptico');
 
 // The passphrase used to repeatably generate this RSA key.
-var PassPhrase = "The Moon is a Harsh Mistress."; 
+var PassPhrase = "No need to re-invent Bitcoins."; 
  
 // The length of the RSA key, in bits.
-var Bits = 1024; 
+var Bits = 2048; //1024; 
   
 var MattsRSAkey = cryptico.generateRSAKey(PassPhrase, Bits);
 

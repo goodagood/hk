@@ -1,14 +1,19 @@
 
 
-Game of Blockchain, CPU of mobile phone, 
+
+To help protesters building up blockchains, copy ideas from Bitcoins,
+and guide cryptocurrencies to protesters who need the cash.
+
+Blockchain, bitcoins, CPU of mobile phone, 
 a pair of public key and private key.
 
 decentralized,
 bitcoins centralized as 0.5% accounts occupied over 87% coins.
 
-2 chains: one fake, one real.
+2 chains: one truth, one false.
+localized to some where, 
 
-Guide random efforts to helpless protesters.
+Guide random efforts to help protesters.
 
 Protester
 Protestant
@@ -21,3 +26,14 @@ The design is so simple and robust, 2 students can start it.
 
 Install: git clone .... npm install ... node app.js
 Deploy:  gcloud app deploy #google for details of gcloud
+
+
+Building parts
+==============
+
+    RSA mathematics
+        Private Key, Public Key
+    Hash, SHA1,2,3, SHA256
+    Digital Signature
+    
+
