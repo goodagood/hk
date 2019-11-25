@@ -72,10 +72,17 @@ button {
 <div class="clear-fix"></div>
 <footer>
   <div class="full-width">
-    CopyLeft goodogood, goodagood, Andrew, 2019 2020 <br />
+    CopyLeft: goodogood, goodagood, Andrew, 2019 2020 <br />
   </div>
   <div id="debugInfo"> </div>
 </footer>
+
+<div id="vue-template" style="display:none">
+  <div id="find-pubkey-pem">
+    <p> {{info}} </p>
+    <a href="." onclick="console.log('give me a callback');">{{pem}} </a>
+  </div>
+</div>
 
 
 <script src="./bc3.js"></script>

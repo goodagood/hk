@@ -64,6 +64,7 @@ button {
     <button id='newPubKey'>New Public Key</button>
     <button id='publish'>Publish Key</button>
     <button id='findKey'>Find User</button>
+    <button id='transaction'>Transfer Coins</button>
     <button id='time'>Time</button>
     <div id='info'> </div>
   </div>
@@ -76,6 +77,13 @@ button {
   </div>
   <div id="debugInfo"> </div>
 </footer>
+
+<div id="vue-template" style="display:none">
+  <div id="find-pubkey-pem">
+    <p> {{info}} </p>
+    <a href="." onclick="console.log('give me a callback');">{{pem}} </a>
+  </div>
+</div>
 
 
 <script src="./bc3.js"></script>

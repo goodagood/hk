@@ -1,27 +1,37 @@
 
 
-function listUser(jData){
-    for(let k in jData){
+var Vue = require("vue");
 
+
+
+function listUserPem(jData, infoDivID, clickCallback){
+    for(let k in jData){
+        insertInfo(infoDivID, k, clickCallback);
     }
 }
 
-function buildPubpemClick(infoDivID, text){
-        var paragraph = document.createElement("a");
-        var textnode = document.createTextNode(text);
-        paragraph.appendChild(textnode);
+function insertInfo(infoDivID, k, callback){
+    var where = document.getElementById(infoDivID);
 
-        var where = document.getElementById(infoDivID);
-        where.insertBefore(paragraph, where.firstChild);
+    var info = buildPubpemClick(infoDivID, k, callback);
+    where.insertBefore(info, where.firstChild);
+}
+
+function buildPubpemClick(infoDivID, pem, callback){
+        var paragraph = document.createElement("p");
+        var a = createAnchor(pem, callback);
+        paragraph.appendChild(a);
+
+        return paragraph;
 }
 
 
-function createAnchor(data){
+function createAnchor(pem, callback){
 	// Create anchor element. 
 	var a = document.createElement('a');  
 
 	// Create the text node for anchor element. 
-	var link = document.createTextNode(data['pubpem']); 
+	var link = document.createTextNode(pem); 
 
 	// Append the text node to anchor element. 
 	a.appendChild(link);  
@@ -29,10 +39,18 @@ function createAnchor(data){
 	// Set the title. 
 	a.title = "pem of public key";  
 
-    a.data = data['pubpem'];  //?
 
 	// Set the href property. 
 	a.href = ".";  
 
+    a.onclick = function(e){
+        e.preventDefault();
+        console.log(pem.slice(72,108));
+        callback(pem);
+    };
+
 	return a;
 }
+
+
+module.exports.listUserPem = listUserPem;

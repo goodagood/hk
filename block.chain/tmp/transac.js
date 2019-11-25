@@ -2,7 +2,7 @@
 
 const forge = require('./forge.js');
 
-function makeTransaction (timestamp=null, payer=null, payee=null, data=null, ){
+function makeTransaction (timestamp=null, payer=null, payee=null, data=null){
     let obj = {};
     obj.payer = payer || 'payer pub key';
     obj.payee = payee || 'payee pub key';
@@ -12,7 +12,7 @@ function makeTransaction (timestamp=null, payer=null, payee=null, data=null, ){
     obj.timestamp = timestamp || new Date().getTime();
     obj.position = {payer: {lat:0, lng:0}, payee: {lat:0, lng:0}}; // position pair
 
-    obj.amount = 'coins number';
+    obj.amount = 0; //'coins number';
     obj.cashUnit = 'HKD';
 
     obj.randomNumber = 0;

@@ -7,14 +7,19 @@
 var myutil = require('../util.js');
 var forge = require('./forge.js');
 
+var listUserPem = require('./listpubkey.js');
+var trans = require('./transac.js');
 
 const p = console.log;
 
 
 forge.genkey(function(err, key){
-    p('start to generate key pair');
-    myutil.showInfo('info', 'generate kay pair...');
     if(err) { return p(err); }
+    p('generate key pair');
+    myutil.showInfo('info', 'generate kay pair...');
+
+    // variables
+    var _payee;
 
     window.key = key;
     var privateKey = key.privateKey;
@@ -23,10 +28,29 @@ forge.genkey(function(err, key){
     var pubpem = key.pubpem;
     myutil.showInfo('info', pubpem);  // show public key in browser
 
+    function setPayee(pem){
+        _payee = pem;
+        window.payee = pem; //test
+    }
+
     myutil.post({
         action: 'add public key',
         pubpem: pubpem
     }, '/json');
+
+
+    function transfer(payer_pem, payee_pem, message=null){
+        if(!message){
+            message = document.getElementById('textBox').value || 'Money Silent';
+        }
+        var tr = trans.makeTransaction(0, payer_pem, payee_pem, message);
+        p(tr.print());
+
+        //k1.privateKey.sign();
+        var sig = forge.hashSign2Hex(key.privateKey, JSON.stringify(tr.extract()));
+        p(sig);
+        window.sig = sig; //debug
+    }
 
     document.getElementById('newPubKey').onclick = function(e){
         // delete the old pubkey
@@ -55,10 +79,17 @@ forge.genkey(function(err, key){
         function(jReply){
             p('number of keys: ', Object.keys(jReply).length);
             window.myfind = jReply;
-            for(let k in jReply){
-                myutil.showInfo('info', k);
-            }
+            listUserPem.listUserPem(jReply, 'info', setPayee);
+            //for(let k in jReply){
+            //    myutil.showInfo('info', k);
+            //}
         });
+    };
+    document.getElementById('transaction').onclick = function(e){
+        p('to make new key, delete storage');
+        if(_payee){
+            transfer(0, key.pubpem, _payee, 'test debug');
+        }
     };
 });
 
