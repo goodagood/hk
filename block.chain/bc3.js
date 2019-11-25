@@ -268,50 +268,201 @@ exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate :
 },{"process/browser.js":2,"timers":3}],4:[function(require,module,exports){
 
 /*
+ * do transactions
+ *
+ */
+
+var myutil = require('../util.js');
+var forge = require('./forge.js');
+
+
+const p = console.log;
+
+
+forge.genkey(function(err, key){
+    p('start to generate key pair');
+    myutil.showInfo('info', 'generate kay pair...');
+    if(err) { return p(err); }
+
+    window.key = key;
+    var privateKey = key.privateKey;
+    var publicKey  = key.publicKey;
+    var pripem = key.pripem;
+    var pubpem = key.pubpem;
+    myutil.showInfo('info', pubpem);  // show public key in browser
+
+    myutil.post({
+        action: 'add public key',
+        pubpem: pubpem
+    }, '/json');
+
+    document.getElementById('newPubKey').onclick = function(e){
+        // delete the old pubkey
+        //myutil.showInfo('info', pubpem);
+        p('to make new key, delete storage');
+    };
+    document.getElementById('time').onclick = function(e){
+        myutil.showInfo('info', new Date().toString() + '...');
+    };
+    document.getElementById('publish').onclick = function(e){
+        myutil.post({
+            action: 'add public key',
+            pubpem: pubpem
+        },
+        '/json',
+        function(jReply){
+            p(jReply);
+        });
+    };
+    document.getElementById('findKey').onclick = function(e){
+        myutil.post({
+            action: 'find public keys',
+            pubpem: pubpem
+        },
+        '/json',
+        function(jReply){
+            p('number of keys: ', Object.keys(jReply).length);
+            window.myfind = jReply;
+            for(let k in jReply){
+                myutil.showInfo('info', k);
+            }
+        });
+    };
+});
+
+
+
+
+
+function getLatlng(cb){
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            var pos = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            };
+            console.log(pos);
+
+            return cb(null, pos);
+
+            //putInfo(map, pos, text);
+            // This change center to browser's pos
+            //map.setCenter(pos);
+        }, function(err) {
+            p(err);
+            cb(err); // err is true
+        });
+    }else{
+        cb('!navigator.geolocation');
+    }
+}
+
+
+
+
+function sha256hex(text){
+    var md = forge.md.sha256.create();
+    md.update(text);
+    return md.digest().toHex();
+}
+
+
+if(window){
+}
+
+},{"../util.js":6,"./forge.js":5}],5:[function(require,module,exports){
+
+/*
  * Give basic functions of generate keys, signing, hash
  *
  */
 
 var forge = require('node-forge');
-var myutil= require('../util.js');
 
 var rsa = forge.pki.rsa;
 
 const p = console.log;
 
 
-// generate an RSA key pair synchronously
-// *NOT RECOMMENDED*: Can be significantly slower than async and may block
-// JavaScript execution. Will use native Node.js 10.12.0+ API if possible.
-var kpOne = rsa.generateKeyPair({bits: 2048, e: 0x10001});
-var kpTwo = rsa.generateKeyPair({bits: 2048, e: 0x10001});
+function genkey(cb){
+    var kp;
+    rsa.generateKeyPair({bits: 2048, workers: 2}, function(err, keypair) {
+        if(err){cb(err); return;}
 
-var privateKey = kpOne.privateKey;
-var publicKey  = kpOne.publicKey;
-
-
-// give printable string
-var pripem = forge.pki.privateKeyToPem(privateKey);
-var pubpem = forge.pki.publicKeyToPem(publicKey);
-myutil.showInfo('info', pubpem);  // show public key in browser
-
-document.getElementById('showPubkey').onclick = function(e){
-    myutil.showInfo('info', pubpem);
-};
-document.getElementById('showPrikey').onclick = function(e){
-    myutil.showInfo('info', pripem);
-};
+        keypair.pripem = forge.pki.privateKeyToPem(keypair.privateKey);
+        keypair.pubpem = forge.pki.publicKeyToPem(keypair.publicKey);
+        cb(null, keypair);
+    });
+}
 
 
-// how to hash sha256
-var md = forge.md.sha256.create();
-md.update('The quick brown fox jumps over the lazy dog');
-console.log(md.digest().toHex());
+//// how to hash sha256
+//var md = forge.md.sha256.create();
+//md.update('The quick brown fox jumps over the lazy dog');
+//console.log(md.digest().toHex());
 // output: d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592
 
-// how to sign the md
-var sig = privateKey.sign(md);
-var sigHex64 = forge.util.encode64(sig);
+//// how to sign the md
+// ? DigestInfo DER-encoded bytes
+// ? defaults to RSASSA PKCS#1 v1.5
+//var sig = privateKey.sign(md);
+//var sigHex64 = forge.util.encode64(sig);
+
+// verify data with a public key
+// (defaults to RSASSA PKCS#1 v1.5)
+// var verified = publicKey.verify(md.digest().bytes(), signature);
+
+
+function hashSign2Hex(key, text){
+    // think the key is RSA private key
+    var md = forge.md.sha256.create();
+    md.update(text);
+    var sig = key.sign(md);
+    var sigHex64 = forge.util.encode64(sig);
+    return sigHex64;
+}
+
+
+//
+
+
+/*
+ * Block, blockchain, hash
+ *
+ */
+
+
+
+
+function sha256hex(text){
+    var md = forge.md.sha256.create();
+    md.update(text);
+    return md.digest().toHex();
+}
+
+
+module.exports.sha256hex = sha256hex;
+module.exports.genkey = genkey;
+module.exports.hashSign2Hex = hashSign2Hex;
+
+/*
+p(typeof window == "undefined" )
+if(typeof window == "undefined" ){
+    //testing in console
+}
+*/
+
+},{"node-forge":19}],6:[function(require,module,exports){
+
+
+function showInfo(infoDivID, text){
+        var paragraph = document.createElement("pre");
+        var textnode = document.createTextNode(text);
+        paragraph.appendChild(textnode);
+
+        var where = document.getElementById(infoDivID);
+        where.insertBefore(paragraph, where.firstChild);
+}
 
 
 function sliceObj(obj) {
@@ -321,177 +472,6 @@ function sliceObj(obj) {
         if (keys[i] in obj) o[keys[i]] = obj[keys[i]];
     }
     return o;
-}
-
-/*
- *
-
-// generate an RSA key pair asynchronously (uses web workers if available)
-// use workers: -1 to run a fast core estimator to optimize # of workers
-// *RECOMMENDED*: Can be significantly faster than sync. Will use native
-// Node.js 10.12.0+ or WebCrypto API if possible.
-//rsa.generateKeyPair({bits: 2048, workers: 2}, function(err, keypair) {
-  // keypair.privateKey, keypair.publicKey
-//});
-
-// generate an RSA key pair in steps that attempt to run for a specified period
-// of time on the main JS thread
-var state = rsa.createKeyPairGenerationState(2048, 0x10001);
-var step = function() {
-  // run for 100 ms
-  if(!rsa.stepKeyPairGenerationState(state, 100)) {
-    setTimeout(step, 1);
-  }
-  else {
-    // done, turn off progress indicator, use state.keys
-    p(state);
-  }
-};
-// turn on progress indicator, schedule generation to run
-setTimeout(step);
-
-
-// sign data with a private key and output DigestInfo DER-encoded bytes
-// (defaults to RSASSA PKCS#1 v1.5)
-var md = forge.md.sha1.create();
-md.update('sign this', 'utf8');
-var signature = privateKey.sign(md);
-//p(md, signature);
-
-// verify data with a public key
-// (defaults to RSASSA PKCS#1 v1.5)
-var verified = publicKey.verify(md.digest().bytes(), signature);
- *
-*/
-
-
-// sign data using RSASSA-PSS where PSS uses a SHA-1 hash, a SHA-1 based
-// masking function MGF1, and a 20 byte salt
-var md = forge.md.sha1.create();
-md.update('sign this', 'utf8');
-var pss = forge.pss.create({
-  md: forge.md.sha1.create(),
-  mgf: forge.mgf.mgf1.create(forge.md.sha1.create()),
-  saltLength: 20
-  // optionally pass 'prng' with a custom PRNG implementation
-  // optionalls pass 'salt' with a forge.util.ByteBuffer w/custom salt
-});
-var signature = privateKey.sign(md, pss);
-
-/*
-
-// verify RSASSA-PSS signature
-var pss = forge.pss.create({
-  md: forge.md.sha1.create(),
-  mgf: forge.mgf.mgf1.create(forge.md.sha1.create()),
-  saltLength: 20
-  // optionally pass 'prng' with a custom PRNG implementation
-});
-var md = forge.md.sha1.create();
-md.update('sign this', 'utf8');
-publicKey.verify(md.digest().getBytes(), signature, pss);
-
-// encrypt data with a public key (defaults to RSAES PKCS#1 v1.5)
-var encrypted = publicKey.encrypt(bytes);
-
-// decrypt data with a private key (defaults to RSAES PKCS#1 v1.5)
-var decrypted = privateKey.decrypt(encrypted);
-
-// encrypt data with a public key using RSAES PKCS#1 v1.5
-var encrypted = publicKey.encrypt(bytes, 'RSAES-PKCS1-V1_5');
-
-// decrypt data with a private key using RSAES PKCS#1 v1.5
-var decrypted = privateKey.decrypt(encrypted, 'RSAES-PKCS1-V1_5');
-
-// encrypt data with a public key using RSAES-OAEP
-var encrypted = publicKey.encrypt(bytes, 'RSA-OAEP');
-
-// decrypt data with a private key using RSAES-OAEP
-var decrypted = privateKey.decrypt(encrypted, 'RSA-OAEP');
-
-// encrypt data with a public key using RSAES-OAEP/SHA-256
-var encrypted = publicKey.encrypt(bytes, 'RSA-OAEP', {
-  md: forge.md.sha256.create()
-});
-
-// decrypt data with a private key using RSAES-OAEP/SHA-256
-var decrypted = privateKey.decrypt(encrypted, 'RSA-OAEP', {
-  md: forge.md.sha256.create()
-});
-
-// encrypt data with a public key using RSAES-OAEP/SHA-256/MGF1-SHA-1
-// compatible with Java's RSA/ECB/OAEPWithSHA-256AndMGF1Padding
-var encrypted = publicKey.encrypt(bytes, 'RSA-OAEP', {
-  md: forge.md.sha256.create(),
-  mgf1: {
-    md: forge.md.sha1.create()
-  }
-});
-
-// decrypt data with a private key using RSAES-OAEP/SHA-256/MGF1-SHA-1
-// compatible with Java's RSA/ECB/OAEPWithSHA-256AndMGF1Padding
-var decrypted = privateKey.decrypt(encrypted, 'RSA-OAEP', {
-  md: forge.md.sha256.create(),
-  mgf1: {
-    md: forge.md.sha1.create()
-  }
-});
-
-//*/
-//
-
-
-/*
- * Block, blockchain, hash
- *
- */
-
-function makeBlock (timestamp=null, data=null, previousHash=null){
-    let obj = {};
-    obj.previousHash = previousHash;
-    obj.timestamp = timestamp || new Date().getTime();  // new Date().getTime()
-    obj.transactionRoot = {};
-    obj.nonce = null;
-    obj.paymentAccount = 'Face to face, my paypal account...';
-    obj.data = data;
-    obj.talk = "Money/Block can talk";
-
-    obj.hash = null;
-
-
-    obj.latlng = null;
-    obj.getLatlng = function(){
-        getLatlng(function(err, pos){
-            p('get lat lng', err, pos);
-            if (err){
-                obj.latlng = {};
-                return;
-            }
-
-            p(pos);
-            obj.latlng = pos;
-        });
-    };
-
-    obj.repr = function(){
-        var o = {};
-        o['previousHash']  = obj.previousHash;
-        o['timestamp']     = obj.timestamp;
-        o['paymentAccount']= obj.paymentAccount;
-        o['data']          = obj.data;
-        o['talk']          = obj.talk;
-        o['latlng']        = obj.latlng;       
-        
-        return JSON.stringify(o, null, 4); // 4 space indent
-    }
-
-    obj.calculateHash = function() {
-        obj.hash = sha256hex( obj.repr());
-        return obj.hash;
-    };
-    obj.hash = obj.calculateHash();
-
-    return obj;
 }
 
 
@@ -518,60 +498,61 @@ function getLatlng(cb){
     }
 }
 
-var b = makeBlock(new Date().getTime(), "Genesis Block");
 
-document.getElementById('block').onclick = function(e){
-    myutil.showInfo('info', b.repr);
-}
-document.getElementById('hash').onclick = function(e){
-    myutil.showInfo('info', b.hash);
-}
+function post(data, url='/json', cb=console.log ){
+    var xhr = new XMLHttpRequest();
 
-document.getElementById('doBlockchain').onclick = function(e){
-    //myutil.showInfo('info', b.hash);
-    var text = document.getElementById('textBox').value || 'no user input';
-    p(text)
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
 
-    var bloc = makeBlock(new Date().getTime(), text);
-    myutil.showInfo('info', JSON.stringify(bloc, null, 4));
+    xhr.onreadystatechange = function () {
+        p ('xhr   ', xhr.readyState , xhr.status) ;
+        if (xhr.readyState === 4 && xhr.status === 200) 
+        {
+            console.log('xhr.responseText'); console.log(xhr.responseText);
+            var jsonReply = JSON.parse(xhr.responseText);
+            cb(jsonReply);
+        }// do't do else
+    };
 
-    b = bloc;
-    window.b = bloc;
-}
-
-function sha256hex(text){
-    var md = forge.md.sha256.create();
-    md.update(text);
-    return md.digest().toHex();
+    var json = JSON.stringify(data);
+    //console.log('post json data: ', json);
+    xhr.send(json);
 }
 
 
-if(window){
-    window.f = forge;
-    window.b = b;
-    window.pri = privateKey;
-    window.pub = publicKey;
-    window.md = md;
-    b.getLatlng();
-    console.log('ready, f,b,pri,pub');
+function storageAvailable(type) {
+    // type: 'localStorage' or 'sessionStorage'
+
+    var storage;
+    try {
+        storage = window[type];
+        var x = '__storage_test__';
+        storage.setItem(x, x);
+        storage.removeItem(x);
+        return true;
+    }
+    catch(e) {
+        return e instanceof DOMException && (
+            // everything except Firefox
+            e.code === 22 ||
+            // Firefox
+            e.code === 1014 ||
+            // test name field too, because code might not be present
+            // everything except Firefox
+            e.name === 'QuotaExceededError' ||
+            // Firefox
+            e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+            // acknowledge QuotaExceededError only if there's something already stored
+            (storage && storage.length !== 0);
+    }
 }
-
-},{"../util.js":5,"node-forge":18}],5:[function(require,module,exports){
-
-
-function showInfo(infoDivID, text){
-        var paragraph = document.createElement("pre");
-        var textnode = document.createTextNode(text);
-        paragraph.appendChild(textnode);
-
-        var where = document.getElementById(infoDivID);
-        where.insertBefore(paragraph, where.firstChild);
-}
-
 
 module.exports.showInfo = showInfo;
+module.exports.sliceObj = sliceObj;
+module.exports.post = post;
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 /**
  * Advanced Encryption Standard (AES) implementation.
  *
@@ -1664,7 +1645,7 @@ function _createCipher(options) {
   return cipher;
 }
 
-},{"./cipher":11,"./cipherModes":12,"./forge":16,"./util":48}],7:[function(require,module,exports){
+},{"./cipher":12,"./cipherModes":13,"./forge":17,"./util":49}],8:[function(require,module,exports){
 /**
  * A Javascript implementation of AES Cipher Suites for TLS.
  *
@@ -1948,7 +1929,7 @@ function compareMacs(key, mac1, mac2) {
   return mac1 === mac2;
 }
 
-},{"./aes":6,"./forge":16,"./tls":47}],8:[function(require,module,exports){
+},{"./aes":7,"./forge":17,"./tls":48}],9:[function(require,module,exports){
 /**
  * Copyright (c) 2019 Digital Bazaar, Inc.
  */
@@ -2041,7 +2022,7 @@ exports.publicKeyValidator = {
   ]
 };
 
-},{"./asn1":9,"./forge":16}],9:[function(require,module,exports){
+},{"./asn1":10,"./forge":17}],10:[function(require,module,exports){
 /**
  * Javascript implementation of Abstract Syntax Notation Number One.
  *
@@ -3451,7 +3432,7 @@ asn1.prettyPrint = function(obj, level, indentation) {
   return rval;
 };
 
-},{"./forge":16,"./oids":27,"./util":48}],10:[function(require,module,exports){
+},{"./forge":17,"./oids":28,"./util":49}],11:[function(require,module,exports){
 (function (Buffer){
 /**
  * Base-N/Base-X encoding/decoding functions.
@@ -3641,7 +3622,7 @@ function _encodeWithByteBuffer(input, alphabet) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":1}],11:[function(require,module,exports){
+},{"buffer":1}],12:[function(require,module,exports){
 /**
  * Cipher base API.
  *
@@ -3873,7 +3854,7 @@ BlockCipher.prototype.finish = function(pad) {
   return true;
 };
 
-},{"./forge":16,"./util":48}],12:[function(require,module,exports){
+},{"./forge":17,"./util":49}],13:[function(require,module,exports){
 /**
  * Supported cipher modes.
  *
@@ -4874,7 +4855,7 @@ function from64To32(num) {
   return [(num / 0x100000000) | 0, num & 0xFFFFFFFF];
 }
 
-},{"./forge":16,"./util":48}],13:[function(require,module,exports){
+},{"./forge":17,"./util":49}],14:[function(require,module,exports){
 /**
  * Debugging support for web applications.
  *
@@ -4954,7 +4935,7 @@ forge.debug.clear = function(cat, name) {
   }
 };
 
-},{"./forge":16}],14:[function(require,module,exports){
+},{"./forge":17}],15:[function(require,module,exports){
 /**
  * DES (Data Encryption Standard) implementation.
  *
@@ -5452,7 +5433,7 @@ function _createCipher(options) {
   return cipher;
 }
 
-},{"./cipher":11,"./cipherModes":12,"./forge":16,"./util":48}],15:[function(require,module,exports){
+},{"./cipher":12,"./cipherModes":13,"./forge":17,"./util":49}],16:[function(require,module,exports){
 (function (Buffer){
 /**
  * JavaScript implementation of Ed25519.
@@ -6528,7 +6509,7 @@ function M(o, a, b) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./asn1-validator":8,"./forge":16,"./jsbn":19,"./random":39,"./sha512":44,"./util":48,"buffer":1}],16:[function(require,module,exports){
+},{"./asn1-validator":9,"./forge":17,"./jsbn":20,"./random":40,"./sha512":45,"./util":49,"buffer":1}],17:[function(require,module,exports){
 /**
  * Node.js module for Forge.
  *
@@ -6543,7 +6524,7 @@ module.exports = {
   }
 };
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /**
  * Hash-based Message Authentication Code implementation. Requires a message
  * digest object that can be obtained, for example, from forge.md.sha1 or
@@ -6691,7 +6672,7 @@ hmac.create = function() {
   return ctx;
 };
 
-},{"./forge":16,"./md":23,"./util":48}],18:[function(require,module,exports){
+},{"./forge":17,"./md":24,"./util":49}],19:[function(require,module,exports){
 /**
  * Node.js module for Forge.
  *
@@ -6728,7 +6709,7 @@ require('./task');
 require('./tls');
 require('./util');
 
-},{"./aes":6,"./aesCipherSuites":7,"./asn1":9,"./cipher":11,"./debug":13,"./des":14,"./ed25519":15,"./forge":16,"./hmac":17,"./kem":20,"./log":21,"./md.all":22,"./mgf1":26,"./pbkdf2":29,"./pem":30,"./pkcs1":31,"./pkcs12":32,"./pkcs7":33,"./pki":35,"./prime":36,"./prng":37,"./pss":38,"./random":39,"./rc2":40,"./ssh":45,"./task":46,"./tls":47,"./util":48}],19:[function(require,module,exports){
+},{"./aes":7,"./aesCipherSuites":8,"./asn1":10,"./cipher":12,"./debug":14,"./des":15,"./ed25519":16,"./forge":17,"./hmac":18,"./kem":21,"./log":22,"./md.all":23,"./mgf1":27,"./pbkdf2":30,"./pem":31,"./pkcs1":32,"./pkcs12":33,"./pkcs7":34,"./pki":36,"./prime":37,"./prng":38,"./pss":39,"./random":40,"./rc2":41,"./ssh":46,"./task":47,"./tls":48,"./util":49}],20:[function(require,module,exports){
 // Copyright (c) 2005  Tom Wu
 // All Rights Reserved.
 // See "LICENSE" for details.
@@ -7994,7 +7975,7 @@ BigInteger.prototype.isProbablePrime = bnIsProbablePrime;
 //long longValue()
 //static BigInteger valueOf(long val)
 
-},{"./forge":16}],20:[function(require,module,exports){
+},{"./forge":17}],21:[function(require,module,exports){
 /**
  * Javascript implementation of RSA-KEM.
  *
@@ -8164,7 +8145,7 @@ function _createKDF(kdf, md, counterStart, digestLength) {
   };
 }
 
-},{"./forge":16,"./jsbn":19,"./random":39,"./util":48}],21:[function(require,module,exports){
+},{"./forge":17,"./jsbn":20,"./random":40,"./util":49}],22:[function(require,module,exports){
 /**
  * Cross-browser support for logging in a web application.
  *
@@ -8483,7 +8464,7 @@ if(sConsoleLogger !== null) {
 // provide public access to console logger
 forge.log.consoleLogger = sConsoleLogger;
 
-},{"./forge":16,"./util":48}],22:[function(require,module,exports){
+},{"./forge":17,"./util":49}],23:[function(require,module,exports){
 /**
  * Node.js module for all known Forge message digests.
  *
@@ -8498,7 +8479,7 @@ require('./sha1');
 require('./sha256');
 require('./sha512');
 
-},{"./md":23,"./md5":24,"./sha1":42,"./sha256":43,"./sha512":44}],23:[function(require,module,exports){
+},{"./md":24,"./md5":25,"./sha1":43,"./sha256":44,"./sha512":45}],24:[function(require,module,exports){
 /**
  * Node.js module for Forge message digests.
  *
@@ -8511,7 +8492,7 @@ var forge = require('./forge');
 module.exports = forge.md = forge.md || {};
 forge.md.algorithms = forge.md.algorithms || {};
 
-},{"./forge":16}],24:[function(require,module,exports){
+},{"./forge":17}],25:[function(require,module,exports){
 /**
  * Message Digest Algorithm 5 with 128-bit digest (MD5) implementation.
  *
@@ -8802,7 +8783,7 @@ function _update(s, w, bytes) {
   }
 }
 
-},{"./forge":16,"./md":23,"./util":48}],25:[function(require,module,exports){
+},{"./forge":17,"./md":24,"./util":49}],26:[function(require,module,exports){
 /**
  * Node.js module for Forge mask generation functions.
  *
@@ -8816,7 +8797,7 @@ require('./mgf1');
 module.exports = forge.mgf = forge.mgf || {};
 forge.mgf.mgf1 = forge.mgf1;
 
-},{"./forge":16,"./mgf1":26}],26:[function(require,module,exports){
+},{"./forge":17,"./mgf1":27}],27:[function(require,module,exports){
 /**
  * Javascript implementation of mask generation function MGF1.
  *
@@ -8875,7 +8856,7 @@ mgf1.create = function(md) {
   return mgf;
 };
 
-},{"./forge":16,"./util":48}],27:[function(require,module,exports){
+},{"./forge":17,"./util":49}],28:[function(require,module,exports){
 /**
  * Object IDs for ASN.1.
  *
@@ -9047,7 +9028,7 @@ _IN('1.3.6.1.5.5.7.3.3', 'codeSigning');
 _IN('1.3.6.1.5.5.7.3.4', 'emailProtection');
 _IN('1.3.6.1.5.5.7.3.8', 'timeStamping');
 
-},{"./forge":16}],28:[function(require,module,exports){
+},{"./forge":17}],29:[function(require,module,exports){
 /**
  * Password-based encryption functions.
  *
@@ -10072,7 +10053,7 @@ function createPbkdf2Params(salt, countBytes, dkLen, prfAlgorithm) {
   return params;
 }
 
-},{"./aes":6,"./asn1":9,"./des":14,"./forge":16,"./md":23,"./oids":27,"./pbkdf2":29,"./pem":30,"./random":39,"./rc2":40,"./rsa":41,"./util":48}],29:[function(require,module,exports){
+},{"./aes":7,"./asn1":10,"./des":15,"./forge":17,"./md":24,"./oids":28,"./pbkdf2":30,"./pem":31,"./random":40,"./rc2":41,"./rsa":42,"./util":49}],30:[function(require,module,exports){
 (function (Buffer){
 /**
  * Password-Based Key-Derivation Function #2 implementation.
@@ -10287,7 +10268,7 @@ module.exports = forge.pbkdf2 = pkcs5.pbkdf2 = function(
 };
 
 }).call(this,require("buffer").Buffer)
-},{"./forge":16,"./hmac":17,"./md":23,"./util":48,"buffer":1,"crypto":1}],30:[function(require,module,exports){
+},{"./forge":17,"./hmac":18,"./md":24,"./util":49,"buffer":1,"crypto":1}],31:[function(require,module,exports){
 /**
  * Javascript implementation of basic PEM (Privacy Enhanced Mail) algorithms.
  *
@@ -10519,7 +10500,7 @@ function ltrim(str) {
   return str.replace(/^\s+/, '');
 }
 
-},{"./forge":16,"./util":48}],31:[function(require,module,exports){
+},{"./forge":17,"./util":49}],32:[function(require,module,exports){
 /**
  * Partial implementation of PKCS#1 v2.2: RSA-OEAP
  *
@@ -10797,7 +10778,7 @@ function rsa_mgf1(seed, maskLength, hash) {
   return t.substring(0, maskLength);
 }
 
-},{"./forge":16,"./random":39,"./sha1":42,"./util":48}],32:[function(require,module,exports){
+},{"./forge":17,"./random":40,"./sha1":43,"./util":49}],33:[function(require,module,exports){
 /**
  * Javascript implementation of PKCS#12.
  *
@@ -11873,7 +11854,7 @@ p12.toPkcs12Asn1 = function(key, cert, password, options) {
  */
 p12.generateKey = forge.pbe.generatePkcs12Key;
 
-},{"./asn1":9,"./forge":16,"./hmac":17,"./oids":27,"./pbe":28,"./pkcs7asn1":34,"./random":39,"./rsa":41,"./sha1":42,"./util":48,"./x509":49}],33:[function(require,module,exports){
+},{"./asn1":10,"./forge":17,"./hmac":18,"./oids":28,"./pbe":29,"./pkcs7asn1":35,"./random":40,"./rsa":42,"./sha1":43,"./util":49,"./x509":50}],34:[function(require,module,exports){
 /**
  * Javascript implementation of PKCS#7 v1.5.
  *
@@ -13132,7 +13113,7 @@ function _decryptContent(msg) {
   }
 }
 
-},{"./aes":6,"./asn1":9,"./des":14,"./forge":16,"./oids":27,"./pem":30,"./pkcs7asn1":34,"./random":39,"./util":48,"./x509":49}],34:[function(require,module,exports){
+},{"./aes":7,"./asn1":10,"./des":15,"./forge":17,"./oids":28,"./pem":31,"./pkcs7asn1":35,"./random":40,"./util":49,"./x509":50}],35:[function(require,module,exports){
 /**
  * Javascript implementation of ASN.1 validators for PKCS#7 v1.5.
  *
@@ -13543,7 +13524,7 @@ p7v.recipientInfoValidator = {
   }]
 };
 
-},{"./asn1":9,"./forge":16,"./util":48}],35:[function(require,module,exports){
+},{"./asn1":10,"./forge":17,"./util":49}],36:[function(require,module,exports){
 /**
  * Javascript implementation of a basic Public Key Infrastructure, including
  * support for RSA public and private keys.
@@ -13647,7 +13628,7 @@ pki.privateKeyInfoToPem = function(pki, maxline) {
   return forge.pem.encode(msg, {maxline: maxline});
 };
 
-},{"./asn1":9,"./forge":16,"./oids":27,"./pbe":28,"./pbkdf2":29,"./pem":30,"./pkcs12":32,"./pss":38,"./rsa":41,"./util":48,"./x509":49}],36:[function(require,module,exports){
+},{"./asn1":10,"./forge":17,"./oids":28,"./pbe":29,"./pbkdf2":30,"./pem":31,"./pkcs12":33,"./pss":39,"./rsa":42,"./util":49,"./x509":50}],37:[function(require,module,exports){
 /**
  * Prime number generation API.
  *
@@ -13946,7 +13927,7 @@ function getMillerRabinTests(bits) {
 
 })();
 
-},{"./forge":16,"./jsbn":19,"./random":39,"./util":48}],37:[function(require,module,exports){
+},{"./forge":17,"./jsbn":20,"./random":40,"./util":49}],38:[function(require,module,exports){
 (function (process){
 /**
  * A javascript implementation of a cryptographically-secure
@@ -14369,7 +14350,7 @@ prng.create = function(plugin) {
 };
 
 }).call(this,require('_process'))
-},{"./forge":16,"./util":48,"_process":2,"crypto":1}],38:[function(require,module,exports){
+},{"./forge":17,"./util":49,"_process":2,"crypto":1}],39:[function(require,module,exports){
 /**
  * Javascript implementation of PKCS#1 PSS signature padding.
  *
@@ -14612,7 +14593,7 @@ pss.create = function(options) {
   return pssobj;
 };
 
-},{"./forge":16,"./random":39,"./util":48}],39:[function(require,module,exports){
+},{"./forge":17,"./random":40,"./util":49}],40:[function(require,module,exports){
 /**
  * An API for getting cryptographically-secure random bytes. The bytes are
  * generated using the Fortuna algorithm devised by Bruce Schneier and
@@ -14805,7 +14786,7 @@ module.exports = forge.random;
 
 })();
 
-},{"./aes":6,"./forge":16,"./prng":37,"./sha256":43,"./util":48}],40:[function(require,module,exports){
+},{"./aes":7,"./forge":17,"./prng":38,"./sha256":44,"./util":49}],41:[function(require,module,exports){
 /**
  * RC2 implementation.
  *
@@ -15217,7 +15198,7 @@ forge.rc2.createDecryptionCipher = function(key, bits) {
   return createCipher(key, bits, false);
 };
 
-},{"./forge":16,"./util":48}],41:[function(require,module,exports){
+},{"./forge":17,"./util":49}],42:[function(require,module,exports){
 /**
  * Javascript implementation of basic RSA algorithms.
  *
@@ -17077,7 +17058,7 @@ function _base64ToBigInt(b64) {
   return new BigInteger(forge.util.bytesToHex(forge.util.decode64(b64)), 16);
 }
 
-},{"./asn1":9,"./forge":16,"./jsbn":19,"./oids":27,"./pkcs1":31,"./prime":36,"./random":39,"./util":48,"crypto":1}],42:[function(require,module,exports){
+},{"./asn1":10,"./forge":17,"./jsbn":20,"./oids":28,"./pkcs1":32,"./prime":37,"./random":40,"./util":49,"crypto":1}],43:[function(require,module,exports){
 /**
  * Secure Hash Algorithm with 160-bit digest (SHA-1) implementation.
  *
@@ -17398,7 +17379,7 @@ function _update(s, w, bytes) {
   }
 }
 
-},{"./forge":16,"./md":23,"./util":48}],43:[function(require,module,exports){
+},{"./forge":17,"./md":24,"./util":49}],44:[function(require,module,exports){
 /**
  * Secure Hash Algorithm with 256-bit digest (SHA-256) implementation.
  *
@@ -17727,7 +17708,7 @@ function _update(s, w, bytes) {
   }
 }
 
-},{"./forge":16,"./md":23,"./util":48}],44:[function(require,module,exports){
+},{"./forge":17,"./md":24,"./util":49}],45:[function(require,module,exports){
 /**
  * Secure Hash Algorithm with a 1024-bit block size implementation.
  *
@@ -18290,7 +18271,7 @@ function _update(s, w, bytes) {
   }
 }
 
-},{"./forge":16,"./md":23,"./util":48}],45:[function(require,module,exports){
+},{"./forge":17,"./md":24,"./util":49}],46:[function(require,module,exports){
 /**
  * Functions to output keys in SSH-friendly formats.
  *
@@ -18528,7 +18509,7 @@ function _sha1() {
   return sha.digest();
 }
 
-},{"./aes":6,"./forge":16,"./hmac":17,"./md5":24,"./sha1":42,"./util":48}],46:[function(require,module,exports){
+},{"./aes":7,"./forge":17,"./hmac":18,"./md5":25,"./sha1":43,"./util":49}],47:[function(require,module,exports){
 /**
  * Support for concurrent task management and synchronization in web
  * applications.
@@ -19255,7 +19236,7 @@ forge.task.createCondition = function() {
   return cond;
 };
 
-},{"./debug":13,"./forge":16,"./log":21,"./util":48}],47:[function(require,module,exports){
+},{"./debug":14,"./forge":17,"./log":22,"./util":49}],48:[function(require,module,exports){
 /**
  * A Javascript implementation of Transport Layer Security (TLS).
  *
@@ -23539,7 +23520,7 @@ forge.tls.createSessionCache = tls.createSessionCache;
  */
 forge.tls.createConnection = tls.createConnection;
 
-},{"./asn1":9,"./forge":16,"./hmac":17,"./md5":24,"./pem":30,"./pki":35,"./random":39,"./sha1":42,"./util":48}],48:[function(require,module,exports){
+},{"./asn1":10,"./forge":17,"./hmac":18,"./md5":25,"./pem":31,"./pki":36,"./random":40,"./sha1":43,"./util":49}],49:[function(require,module,exports){
 (function (process,global,Buffer,__argument0,__argument1,__argument2,__argument3,setImmediate){
 /**
  * Utility functions for web applications.
@@ -26543,7 +26524,7 @@ util.estimateCores = function(options, callback) {
 };
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer,arguments[3],arguments[4],arguments[5],arguments[6],require("timers").setImmediate)
-},{"./baseN":10,"./forge":16,"_process":2,"buffer":1,"timers":3}],49:[function(require,module,exports){
+},{"./baseN":11,"./forge":17,"_process":2,"buffer":1,"timers":3}],50:[function(require,module,exports){
 /**
  * Javascript implementation of X.509 and related components (such as
  * Certification Signing Requests) of a Public Key Infrastructure.
@@ -29878,4 +29859,4 @@ pki.verifyCertificateChain = function(caStore, chain, options) {
   return true;
 };
 
-},{"./aes":6,"./asn1":9,"./des":14,"./forge":16,"./md":23,"./mgf":25,"./oids":27,"./pem":30,"./pss":38,"./rsa":41,"./util":48}]},{},[4]);
+},{"./aes":7,"./asn1":10,"./des":15,"./forge":17,"./md":24,"./mgf":26,"./oids":28,"./pem":31,"./pss":39,"./rsa":42,"./util":49}]},{},[4]);

@@ -4,6 +4,11 @@
   hash, blockchain data structure
   use ./tmp/f.rsa.js
   npx browserify ./tmp/f.rsa.js -o bc.js
+
+  Enc(m; K) = R(OAEP-pre(m),K)
+  Dec(c; k) = OAEP-post(R(c,k))
+  Sign(m; k) = R(H(m),k)
+  Ver(m; s; K) = R(s,K) == H(m) 
 -->
 <head>
 <meta http-equiv="content-type" content="text/html" />
@@ -11,7 +16,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <meta name="author"   content="Andrew">
-
 
 <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico" />
 
@@ -26,7 +30,7 @@ button {
   font-size:32px;
 }
 #doBlockchain{
-  font-size:30px;
+  font-size:24px;
 }
 #textBox{
   min-width:65%;
@@ -39,7 +43,7 @@ button {
 
 
 <title> 
-    2, Forge js RSA KPI
+    Sign transaction
 </title>
 
 
@@ -50,10 +54,10 @@ button {
 
 <div id="wrapper" >
   <h1> Blockchain </h1>
-  <h2> Chain of Truth, Chain of False </h2>
+  <h2> Localize, vs, most 50c trolls are REMOTE </h2>
   <div id="blockchain">
       <input type="text" name="textBox" id="textBox" />
-      <input type="submit" id="doBlockchain" value="Do Blockchain" />
+      <input type="submit" id="doBlockchain" value="add info" />
   </div>
   <div>
     <button id='showPubkey'>show pUBKey</button>

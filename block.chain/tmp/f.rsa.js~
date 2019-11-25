@@ -15,15 +15,17 @@ const p = console.log;
 // generate an RSA key pair synchronously
 // *NOT RECOMMENDED*: Can be significantly slower than async and may block
 // JavaScript execution. Will use native Node.js 10.12.0+ API if possible.
-var keypair = rsa.generateKeyPair({bits: 2048, e: 0x10001});
-//p(keypair);
+var kpOne = rsa.generateKeyPair({bits: 2048, e: 0x10001});
+var kpTwo = rsa.generateKeyPair({bits: 2048, e: 0x10001});
 
-var privateKey = keypair.privateKey;
-var publicKey  = keypair.publicKey;
+var privateKey = kpOne.privateKey;
+var publicKey  = kpOne.publicKey;
+
 
 // give printable string
 var pripem = forge.pki.privateKeyToPem(privateKey);
 var pubpem = forge.pki.publicKeyToPem(publicKey);
+myutil.showInfo('info', pubpem);  // show public key in browser
 
 document.getElementById('showPubkey').onclick = function(e){
     myutil.showInfo('info', pubpem);
@@ -32,6 +34,26 @@ document.getElementById('showPrikey').onclick = function(e){
     myutil.showInfo('info', pripem);
 };
 
+
+// how to hash sha256
+var md = forge.md.sha256.create();
+md.update('The quick brown fox jumps over the lazy dog');
+console.log(md.digest().toHex());
+// output: d7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592
+
+// how to sign the md
+var sig = privateKey.sign(md);
+var sigHex64 = forge.util.encode64(sig);
+
+
+function sliceObj(obj) {
+    var o = {}
+    , keys = [].slice.call(arguments, 1);
+    for (var i=0; i<keys.length; i++) {
+        if (keys[i] in obj) o[keys[i]] = obj[keys[i]];
+    }
+    return o;
+}
 
 /*
  *
@@ -166,14 +188,8 @@ function makeBlock (timestamp=null, data=null, previousHash=null){
     obj.data = data;
     obj.talk = "Money/Block can talk";
 
-    obj.repr = JSON.stringify(obj, null, 4); // 4 space indent
     obj.hash = null;
 
-    obj.calculateHash = function() {
-        obj.hash = sha256( obj.repr);
-        return obj.hash;
-    };
-    obj.hash = obj.calculateHash();
 
     obj.latlng = null;
     obj.getLatlng = function(){
@@ -188,6 +204,24 @@ function makeBlock (timestamp=null, data=null, previousHash=null){
             obj.latlng = pos;
         });
     };
+
+    obj.repr = function(){
+        var o = {};
+        o['previousHash']  = obj.previousHash;
+        o['timestamp']     = obj.timestamp;
+        o['paymentAccount']= obj.paymentAccount;
+        o['data']          = obj.data;
+        o['talk']          = obj.talk;
+        o['latlng']        = obj.latlng;       
+        
+        return JSON.stringify(o, null, 4); // 4 space indent
+    }
+
+    obj.calculateHash = function() {
+        obj.hash = sha256hex( obj.repr());
+        return obj.hash;
+    };
+    obj.hash = obj.calculateHash();
 
     return obj;
 }
@@ -231,13 +265,13 @@ document.getElementById('doBlockchain').onclick = function(e){
     p(text)
 
     var bloc = makeBlock(new Date().getTime(), text);
-    myutil.showInfo('info', JSON.stringify(bloc, null, 4));
+    myutil.showInfo('info', JSON.stringify(bloc.repr(), null, 4));
 
     b = bloc;
     window.b = bloc;
 }
 
-function sha256(text){
+function sha256hex(text){
     var md = forge.md.sha256.create();
     md.update(text);
     return md.digest().toHex();
@@ -249,6 +283,7 @@ if(window){
     window.b = b;
     window.pri = privateKey;
     window.pub = publicKey;
+    window.md = md;
     b.getLatlng();
     console.log('ready, f,b,pri,pub');
 }

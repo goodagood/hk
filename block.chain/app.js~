@@ -32,6 +32,7 @@ app.post('/json', (req, res) => {
     //console.log(req.headers);
 
     // req.body is the json request
+    p('// req.body is the json request');
     var replyData = db.jsonAction(req.body); 
     p(replyData);
 
