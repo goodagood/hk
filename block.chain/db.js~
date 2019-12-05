@@ -6,62 +6,125 @@
 
 const _ = require('lodash');
 
-const p = console.log;
+// use NeDb as db
+const NEDB = require('nedb');
+// make an memory data store
+var dbmem = new NEDB({'inMemoryOnly':true});
+dbmem.loadDatabase((err)=>{'do nothing';});
 
-const Transaction = [];
+// db keys: 
+//            'pubpem': pubpem,
+//            'name': 'server',
+//            'milliseconds': Date.now()
+//
 
-function pubkeyDb(){
-    const Pubkey = {};
+var dbs = {'default': dbmem}; // a group of db
 
-    var obj = new Object();
 
-    obj.Pubkey = Pubkey;
 
-    function keyInfo (){
-        var k = Object.keys(Pubkey);
-        p(`Pubkey has ${k.length} keys`);
-    };
-    //obj.keyInfo = keyInfo;
+function insertSrvPem(callback){
+    var forge = require('./tmp/forge.js');
 
-    obj.addKey = function addKey(json){
+    forge.genkey(function(err, key){
+        var privateKey = key.privateKey;
+        var publicKey  = key.publicKey;
+        var pripem = key.pripem;
+        var pubpem = key.pubpem;
 
-        const pubKeyPem = json['pubpem'];
+        var serverRecord = {
+            'pubpem': pubpem,
+            'name': 'server',
+            'milliseconds': Date.now()
+        }
 
-        var obj = _.omit(json, ['action', ]);
-
-        Pubkey[pubKeyPem] = obj;
-
-        p('add obj: ', obj);
-        keyInfo();
-        return {addKey: 'add a public key in simplest pubkeyDb'};
-    }
-
-    obj.findKeys = function findKeys(json){
-        const pubKeyPem = json['pubKeyPem'];
-
-        var allkeys = _.omit(Pubkey, [pubKeyPem]);
-
-        // omit more accordingly ...
-
-        return allkeys;
-    }
-
-    return obj;
+        // insert server's key
+        dbmem.insert(serverRecord); 
+        callback(null, dbmem);
+    })
 }
 
-const Pub   = pubkeyDb();
+function addPem(pem, callback){
+    //p('add pem ', pem);
+    var data = {};
+    data.milliseconds = Date.now();
+
+    if(typeof pem === 'string'){
+        data.pubpem = pem;
+    }else if(typeof pem === 'object' && typeof pem.pubpem === 'string'){
+        data.pubpem = pem.pubpem;
+        _.merge(data, pem);
+    }
+
+    if(typeof data.action !== 'undefined'){ delete data.action; }
+
+    p('insert pem ', data);
+    dbmem.insert(data, callback); 
+    //callback(null, dbmem);
+}
+
+function findPem(json, callback){
+    //json is not used now, because all pem send back
+    
+    var what = {pubpem: {$exists:true}};
+
+    dbmem.count(what, function(err, num){
+        p('dbmem count: ', num);
+    });
+    dbmem.find(what, callback);
+}
+
+function addKV(json, callback){
+    var what = {pubpem: json.pubpem};
+
+    var kv = {what: 'key-value'};
+    //var kv = {json['key'] :  json['value']};
+    kv[json['key']] =  json['value'];
+
+    dbmem.find(what, function(err, docs){
+        var first = docs[0];
+        var obj = _.merge(first, kv);
+        p('dbmem add k,v: ');
+        dbmem.update({"_id": obj['_id']}, obj, callback);
+    });
+}
 
 
-function jsonAction(json){
+const p = console.log;
+
+
+
+
+function jsonAction(json, callback){
     // json is an object, must has json['action']
 
-    if(json['action'] == 'find public keys'){ return Pub.findKeys(json); };
-    if(json['action'] == 'add public key') { return Pub.addKey(json); };
+    if(json['action'] == 'find public keys'){ 
+        return findPem(json, callback);
+    };
+    if(json['action'] == 'add public key') { 
+        return addPem(json, callback);
+    };
+    if(json['action'] == 'add key value') { 
+        return addKV(json, callback);
+    };
 
     // must give a return
-    return {err: 'do not know the action'};
+    return callback({err: 'do not know the action'});
 }
 
 
 
 module.exports.jsonAction = jsonAction;
+
+// this serve as init db, 
+// good to pass db as variable, 
+// instead of require it from different places
+module.exports.insertSrvPem = insertSrvPem;
+
+
+//if(typeof window === 'undefined'){
+//    p('window is undefined');
+//    var db;
+//    insertSrvPem(function(err, d){
+//        db = d;
+//    });
+//}

@@ -17,29 +17,30 @@ const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 
-app.use(express.static('./')); //serve all file in current folder
-//app.use(express.static(path.join(__dirname, "statics")));
+//app.use(express.static('./')); //serve all file in current folder
+app.use(express.static(path.join(__dirname, "statics")));
+app.use(express.static('/my/outside'));
 
 app.get('/', (req, res) => {
     console.log(req['headers']);
-    res.send(getIP() + JSON.stringify(req['headers']))
+    res.send(getIP(req) + JSON.stringify(req['headers']))
 });
 
 
 app.post('/json', (req, res) => {
 
-    console.log(req.body);
+    //console.log(req.body);
     //console.log(req.headers);
 
     // req.body is the json request
-    p('// req.body is the json request');
-    var replyData = db.jsonAction(req.body); 
-    p(replyData);
+    db.jsonAction(req.body, function(err, replyData){
+        p('callbacked ', replyData);
+        res.writeHead(200, {"Content-Type": "application/json"});
 
-    res.writeHead(200, {"Content-Type": "application/json"});
+        var jsonStr = JSON.stringify(replyData);
+        res.end(jsonStr);
+    }); 
 
-    var jsonStr = JSON.stringify(replyData);
-    res.end(jsonStr);
 });
 
 

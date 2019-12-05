@@ -4,66 +4,133 @@
  *
  */
 
-var myutil = require('../util.js');
+var _ = require('lodash');
+
 var forge = require('./forge.js');
 
+var myutil = require('../util.js');
 var listUserPem = require('./listpubkey.js');
-var trans = require('./transac.js');
+var trans = require('./transac.js'); //?
+var localKeys = require('./getkey.js');
 
-const p = console.log;
+var map = require('./map.js');
+
+var button = require('./button.js');
+var talk = require('./talk.js');
+var kv = require('./kvinput.js');
+
+var balance = require('./balance.js');
+window.ba = balance;
+
+var p = console.log;
 
 
-forge.genkey(function(err, key){
+localKeys.getKey(function(err, key){
     if(err) { return p(err); }
-    p('generate key pair');
-    myutil.showInfo('info', 'generate kay pair...');
+    myutil.showInfo('info', 'get kay pair...');
+
+    var Dat = {}; // Data
+    var Fun = {}; // Functions
+
+    //Dat.key = key;
+    window.dat = Dat; window.fun = Fun; //debug
 
     // variables
     var _payee;
 
     window.key = key;
-    var privateKey = key.privateKey;
-    var publicKey  = key.publicKey;
-    var pripem = key.pripem;
-    var pubpem = key.pubpem;
-    myutil.showInfo('info', pubpem);  // show public key in browser
+    Dat.privateKey = key.privateKey;
+    Dat.publicKey  = key.publicKey;
+    Dat.pripem = key.pripem;
+    Dat.pubpem = key.pubpem;
+    myutil.showInfo('info', Dat.pubpem);  // show public key in browser
+
+    // init map
+    //var mapDiv = document.getElementById("map");
+    p('google map ... fetching ...');
+    map.fetchGoogleMapApi(function(){
+        Dat['map.object']= map.createMap(document.getElementById("map"), 300, {});
+        myutil.showInfo('info', 'Google Map API ready');
+        p('google map API ... fetchinged');
+    });
 
     function setPayee(pem){
         _payee = pem;
+        Dat.payee = pem;
         window.payee = pem; //test
     }
 
-    myutil.post({
-        action: 'add public key',
-        pubpem: pubpem
-    }, '/json');
 
-
+    //moving to balance
     function transfer(payer_pem, payee_pem, message=null){
         if(!message){
             message = document.getElementById('textBox').value || 'Money Silent';
         }
-        var tr = trans.makeTransaction(0, payer_pem, payee_pem, message);
-        p(tr.print());
+        var amount = parseFloat(message) || 0.0;
+        var data = {
+            amount: amount,
+            message: message
+        };
+
+        var tr = trans.makeTransaction(0, payer_pem, payee_pem, data);
 
         //k1.privateKey.sign();
         var sig = forge.hashSign2Hex(key.privateKey, JSON.stringify(tr.extract()));
         p(sig);
-        window.sig = sig; //debug
     }
 
-    document.getElementById('newPubKey').onclick = function(e){
-        // delete the old pubkey
-        //myutil.showInfo('info', pubpem);
-        p('to make new key, delete storage');
+    document.getElementById('newKey').onclick = function(e){
+        // ?no delete the old pubkey
+        forge.genkey(function(err, key){
+            Dat.privateKey = key.privateKey;
+            Dat.publicKey  = key.publicKey;
+            Dat.pripem = key.pripem;
+            Dat.pubpem = key.pubpem;
+            localKeys.setKeyPair(key); // only pem
+            myutil.showInfo('info', Dat.pubpem);
+        })
     };
-    document.getElementById('time').onclick = function(e){
-        myutil.showInfo('info', new Date().toString() + '...');
+
+    document.getElementById('state').onclick = function(e){
+        myutil.showInfo('info', JSON.stringify(
+                    _.pick(Dat, ['pubpem', 'payee']),
+                    null, 4) 
+                );
+    };
+    document.getElementById('clearPayee').onclick = function(e){
+        Dat.payee = null;
+        _payee = null;
+    };
+    document.getElementById('keyValue').onclick = function(e){
+        kv.kvInput(function(err, k, v){
+            p('back to callback');
+            myutil.post({
+                action: 'add key value',
+                pubpem: Dat.pubpem,
+                key: k,
+                value: v
+            },
+            '/json',
+            function(jReply){
+                p('k,v, add ', jReply);
+            });
+
+        });
+    };
+    document.getElementById('balance').onclick = function(e){
+        // check my balance
+        p('balance');
+    };
+    document.getElementById('privateKey').onclick = function(e){
+        myutil.showInfo('info', Dat.pripem );
+    };
+    document.getElementById('publicKey').onclick = function(e){
+        myutil.showInfo('info', Dat.pubpem );
     };
     document.getElementById('publish').onclick = function(e){
         myutil.post({
             action: 'add public key',
-            pubpem: pubpem
+            pubpem: Dat.pubpem
         },
         '/json',
         function(jReply){
@@ -73,52 +140,48 @@ forge.genkey(function(err, key){
     document.getElementById('findKey').onclick = function(e){
         myutil.post({
             action: 'find public keys',
-            pubpem: pubpem
+            pubpem: Dat.pubpem
         },
         '/json',
         function(jReply){
             p('number of keys: ', Object.keys(jReply).length);
-            window.myfind = jReply;
+            // list pem and make it clickable
             listUserPem.listUserPem(jReply, 'info', setPayee);
-            //for(let k in jReply){
-            //    myutil.showInfo('info', k);
-            //}
         });
     };
     document.getElementById('transaction').onclick = function(e){
-        p('to make new key, delete storage');
         if(_payee){
-            transfer(0, key.pubpem, _payee, 'test debug');
+            balance.transfer(0, key.pubpem, _payee, 'test debug');
         }
+    };
+    document.getElementById('talk').onclick = function(e){
+        talk.talk(e, Dat.pubpem, Dat['map.object']);
+    }
+    document.getElementById('mapup').onclick = function(e){
+        var mapDiv = document.getElementById("map");
+
+        if( ! Dat['map.object']){
+            p('no map object, reload google api!');
+            map.fetchGoogleMapApi(function(){
+                if(typeof google != 'undefined'){
+                    Dat['map.object']= map.createMap(mapDiv, 300, {});
+                    myutil.showInfo('info', 'Google Map API ready');
+                    p('google map API ... loaded now');
+                }else{
+                    p('google: undefined ');
+                }
+            });
+
+        }
+
+        var info = document.getElementById('info');
+        info.insertBefore(mapDiv, info.firstChild);
     };
 });
 
 
 
 
-
-function getLatlng(cb){
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            var pos = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-            };
-            console.log(pos);
-
-            return cb(null, pos);
-
-            //putInfo(map, pos, text);
-            // This change center to browser's pos
-            //map.setCenter(pos);
-        }, function(err) {
-            p(err);
-            cb(err); // err is true
-        });
-    }else{
-        cb('!navigator.geolocation');
-    }
-}
 
 
 
@@ -130,5 +193,15 @@ function sha256hex(text){
 }
 
 
-if(window){
-}
+
+// for test
+var $ = require('jquery');
+window.kv = kv;
+window.$ = $;
+//setTimeout(function(){
+//    p('5000');
+//    kv.kvInput(function(err, k,v){
+//        p(k, v);
+//    });
+//},5000);
+

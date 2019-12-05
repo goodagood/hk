@@ -5,6 +5,8 @@
 
         <h1>POPO MAP</h1>
 
+        <img src="./svg/po.brutal.svg" /> 
+        <img src="./svg/1296040.svg" /> 
         <div id="googleMap" style="width:80%;height:400px;"></div>
 
    <script>
@@ -44,6 +46,20 @@
             //icon: '32.popo.png',
             title: '32 pixpopo'
         });
+        var pp3 = new google.maps.Marker({
+            position: { lat: 22.33578, lng: 114.1783272},
+            map: map,
+            icon: './svg/po.brutal.svg',
+            size: google.maps.Size(64,64),
+            title: 'po bru'
+        });
+        //var pp4 = new google.maps.Marker({
+        //    position: { lat: 22.34578, lng: 114.1783272},
+        //    map: map,
+        //    icon: './svg/1296040.svg',
+        //    //size: google.maps.Size(64,64),
+        //    title: 'po bru'
+        //});
     }
    </script>
 

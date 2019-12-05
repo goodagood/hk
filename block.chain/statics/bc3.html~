@@ -1,0 +1,123 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<!-- 
+  get payee pub key, talk with payee, sign the transaction
+  use ./tmp/bc3src.js
+  npx browserify ./tmp/bc3src.js -o bc3.js
+
+  How to encrypt, decrypt, sign, verify
+  Enc(m; K) = R(OAEP-pre(m),K)
+  Dec(c; k) = OAEP-post(R(c,k))
+  Sign(m; k) = R(H(m),k)
+  Ver(m; s; K) = R(s,K) == H(m) 
+-->
+<head>
+<meta http-equiv="content-type" content="text/html" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author"   content="Andrew">
+
+<link rel="shortcut icon" type="image/x-icon" href="./favicon.ico" />
+
+<!--
+<link rel="stylesheet" type="text/css" href="./bc.css" >
+-->
+
+
+<style type="text/css">
+#button-group{ padding:10px;}
+button {
+  margin: 5px;
+  font-size:32px;
+}
+#talk{
+  font-size:24px;
+}
+#textBox{
+  min-width:65%;
+  font-size:24px;
+}
+#map { height:350px; }
+
+</style>
+
+
+
+
+<title> 
+    Sign transaction
+</title>
+
+
+</head>
+
+<body>
+
+
+<div id="wrapper" >
+  <h1> Public Keys </h1>
+  <h2> People offer free lunch has no worry of who get it. </h2>
+  <div id="blockchain">
+      <input type="text" name="textBox" id="textBox" />
+      <input type="submit" id="talk" value="talk" />
+  </div>
+  <div id="button-group">
+    <button id='newKey'>New Key</button>
+    <button id='publish'>Publish Key</button>
+    <button id='privateKey'>Show private key</button>
+    <button id='publicKey'>Show Public Key</button>
+    <button id='findKey'>Find User</button>
+    <button id='transaction'>Transfer Value</button>
+    <button id='mapup'>Map Up</button>
+    <button id='state'>State</button>
+    <button id='clearPayee'>Clear Payee</button>
+    <button id='balance'>My Balance</button>
+    <button id='keyValue'>Key:Value</button>
+    <button id='time'>Time</button>
+  </div>
+  <div id='info'> 
+    <div id='map'> </div>
+  </div>
+  <div id="vueButtons"> 
+    <CmdButton 
+      v-for:"butt in buttList"
+      v-bind:butt = "butt"
+    > </CmdButton>
+  </div>
+</div> <!-- end of wrapper -->
+
+<div class="clear-fix"></div>
+<footer>
+  <hr />
+  <div class="full-width">
+    CopyLeft: goodogood, goodagood, Andrew, 2019 2020 <br />
+  </div>
+  <div id="debugInfo"> </div>
+</footer>
+
+<div id="vue-template" style="display:none">
+  <div id="find-pubkey-pem">
+    <p> {{info}} </p>
+    <a href="." onclick="console.log('give me a callback');">{{pem}} </a>
+  </div>
+</div>
+
+
+<script src="./bc3.js"></script>
+
+<script >
+const p = console.log;
+const hk = {lat: 22.28552, lng: 114.15769};  // Hong Kong
+</script>
+
+
+</body>
+<!-- 
+<script async="async" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDiwbgt72z6fOBoM0AnngaWBmdtZd_7t-g&callback=mapCallback"></script>
+
+  vim: et ts=2 sw=2 tw=150
+-->
+</html>
+
+

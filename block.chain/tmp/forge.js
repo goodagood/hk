@@ -49,6 +49,14 @@ function hashSign2Hex(key, text){
     return sigHex64;
 }
 
+function hashVerify(pubKey, text, signature){
+
+    var sig = forge.util.decode64(signature);
+    var md = forge.md.sha256.create();
+    md.update(text);
+    return pubKey.verify(md.digest().bytes(), sig);
+}
+
 
 //
 
@@ -68,13 +76,33 @@ function sha256hex(text){
 }
 
 
+// get public key from private pem
+function publicKeyFromPrivatePem(pem){
+    privateKey = forge.pki.privateKeyFromPem(pem)
+    publicKey  = forge.pki.setRsaPublicKey(privateKey.n, privateKey.e)
+    //console.log(forge.pki.publicKeyToPem(publicKey))
+
+    return {'private': privateKey, 'public':publicKey};
+}
+
+function fingerprint(publicKey){
+    // hex, delimiter :,  string
+    if(typeof publicKey === 'string'){
+        publicKey = forge.pki.publicKeyFromPem(publicKey);
+    }
+    return forge.pki.getPublicKeyFingerprint(publicKey, {encoding: 'hex', delimiter: ':'});
+}
+
+
 module.exports.sha256hex = sha256hex;
 module.exports.genkey = genkey;
 module.exports.hashSign2Hex = hashSign2Hex;
+module.exports.hashVerify = hashVerify;
+module.exports.fingerprint = fingerprint;
+module.exports.publicKeyFromPrivatePem = publicKeyFromPrivatePem;
 
 /*
-p(typeof window == "undefined" )
-if(typeof window == "undefined" ){
-    //testing in console
+if(window){
+    window.f = forge;
 }
 */

@@ -6,13 +6,13 @@ function makeTransaction (timestamp=null, payer=null, payee=null, data=null){
     let obj = {};
     obj.payer = payer || 'payer pub key';
     obj.payee = payee || 'payee pub key';
-    obj.fingerPayer = 'payer pub key finger printer';
-    obj.fingerPayee = 'payee pub key finger printer';
+    obj.fingerPayer = forge.fingerprint(payer) || 'payer pub key finger printer';
+    obj.fingerPayee = forge.fingerprint(payee) || 'payee pub key finger printer';
 
     obj.timestamp = timestamp || new Date().getTime();
     obj.position = {payer: {lat:0, lng:0}, payee: {lat:0, lng:0}}; // position pair
 
-    obj.amount = 0; //'coins number';
+    obj.amount = 0 || data.amount; //'coins number';
     obj.cashUnit = 'HKD';
 
     obj.randomNumber = 0;
@@ -20,6 +20,8 @@ function makeTransaction (timestamp=null, payer=null, payee=null, data=null){
     obj.sponsor = 'who aid the payment...';
     obj.data = data;
     obj.talk = "Money/Block can talk";
+
+    obj.signatures = [];
 
     obj.print = function(){
         var o = {};
@@ -30,7 +32,7 @@ function makeTransaction (timestamp=null, payer=null, payee=null, data=null){
         o['fingerPayer']   = obj.fingerPayer;
         o['fingerPayee']   = obj.fingerPayee;
         o['data']          = obj.data;
-        o['talk']          = obj.talk;
+        //o['talk']          = obj.talk;
         o['position']      = obj.position;
         
         return JSON.stringify(o, null, 4); // 4 space indent
@@ -61,8 +63,8 @@ function makeTransaction (timestamp=null, payer=null, payee=null, data=null){
 module.exports.makeTransaction = makeTransaction;
 
 
-if(typeof window == "undefined" ){
-    //testing in console
-    var t = makeTransaction(0, 'we want free lunch');
-    console.log(t.print());
-}
+//if(typeof window == "undefined" ){
+//    //testing in console
+//    var t = makeTransaction(0, 'we want free lunch');
+//    console.log(t.print());
+//}

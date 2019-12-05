@@ -49,6 +49,14 @@ function hashSign2Hex(key, text){
     return sigHex64;
 }
 
+function hashVerify(pubKey, text, signature){
+
+    var sig = forge.util.decode64(signature);
+    var md = forge.md.sha256.create();
+    md.update(text);
+    return pubKey.verify(md.digest().bytes(), sig);
+}
+
 
 //
 
@@ -58,79 +66,7 @@ function hashSign2Hex(key, text){
  *
  */
 
-function makeBlock (timestamp=null, data=null, previousHash=null){
-    let obj = {};
-    obj.previousHash = previousHash;
-    obj.timestamp = timestamp || new Date().getTime();  // new Date().getTime()
-    obj.transactionRoot = {};
-    obj.nonce = null;
-    obj.paymentAccount = 'Face to face, my paypal account...';
-    obj.data = data;
-    obj.talk = "Money/Block can talk";
 
-    obj.hash = null;
-
-
-    obj.latlng = null;
-    obj.getLatlng = function(){
-        getLatlng(function(err, pos){
-            p('get lat lng', err, pos);
-            if (err){
-                obj.latlng = {};
-                return;
-            }
-
-            p(pos);
-            obj.latlng = pos;
-        });
-    };
-
-    obj.repr = function(){
-        var o = {};
-        o['previousHash']  = obj.previousHash;
-        o['timestamp']     = obj.timestamp;
-        o['paymentAccount']= obj.paymentAccount;
-        o['data']          = obj.data;
-        o['talk']          = obj.talk;
-        o['latlng']        = obj.latlng;       
-        
-        return JSON.stringify(o, null, 4); // 4 space indent
-    }
-
-    obj.calculateHash = function() {
-        obj.hash = sha256hex( obj.repr());
-        return obj.hash;
-    };
-    obj.hash = obj.calculateHash();
-
-    return obj;
-}
-
-
-function getLatlng(cb){
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            var pos = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-            };
-            console.log(pos);
-
-            return cb(null, pos);
-
-            //putInfo(map, pos, text);
-            // This change center to browser's pos
-            //map.setCenter(pos);
-        }, function(err) {
-            p(err);
-            cb(err); // err is true
-        });
-    }else{
-        cb('!navigator.geolocation');
-    }
-}
-
-var b = makeBlock(new Date().getTime(), "Genesis Block");
 
 
 function sha256hex(text){
@@ -140,13 +76,33 @@ function sha256hex(text){
 }
 
 
+// get public key from private pem
+function publicKeyFromPrivatePem(pem){
+    privateKey = forge.pki.privateKeyFromPem(pem)
+    publicKey  = forge.pki.setRsaPublicKey(privateKey.n, privateKey.e)
+    //console.log(forge.pki.publicKeyToPem(publicKey))
+
+    return {'private': privateKey, 'public':publicKey};
+}
+
+function fingerprint(publicKey){
+    // hex, delimiter :,  string
+    if(typeof publicKey === 'string'){
+        publicKey = forge.pki.publicKeyFromPem(publicKey);
+    }
+    return forge.pki.getPublicKeyFingerprint(publicKey, {encoding: 'hex', delimiter: ':'});
+}
+
+
 module.exports.sha256hex = sha256hex;
 module.exports.genkey = genkey;
 module.exports.hashSign2Hex = hashSign2Hex;
+module.exports.hashVerify = hashVerify;
+module.exports.fingerprint = fingerprint;
+module.exports.publicKeyFromPrivatePem = publicKeyFromPrivatePem;
 
 /*
-p(typeof window == "undefined" )
-if(typeof window == "undefined" ){
-    //testing in console
+if(window){
+    window.f = forge;
 }
 */

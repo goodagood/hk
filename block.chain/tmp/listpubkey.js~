@@ -2,10 +2,14 @@
 
 var Vue = require("vue");
 
+var p = console.log;
 
 
 function listUserPem(jData, infoDivID, clickCallback){
+    let limit = 3;
+    let i = 0;
     for(let k in jData){
+        if(i++ > limit){return;}
         insertInfo(infoDivID, k, clickCallback);
     }
 }
@@ -17,21 +21,30 @@ function insertInfo(infoDivID, k, callback){
     where.insertBefore(info, where.firstChild);
 }
 
-function buildPubpemClick(infoDivID, pem, callback){
+function buildPubpemClick(infoDivID, k, callback){
         var paragraph = document.createElement("p");
-        var a = createAnchor(pem, callback);
+
+        if(typeof k['_id'] !== 'undefined'){
+            paragraph.textContent += "id in db :" + k['_id'];
+        }
+        if(typeof k['milliseconds'] !== 'undefined'){
+            paragraph.textContent += "milli : " + k['milliseconds'];
+        }
+
+        p(k);
+        var a = createAnchor(k.pubpem, callback);
         paragraph.appendChild(a);
 
         return paragraph;
 }
 
 
-function createAnchor(data, callback){
+function createAnchor(pem, callback){
 	// Create anchor element. 
 	var a = document.createElement('a');  
 
 	// Create the text node for anchor element. 
-	var link = document.createTextNode(data); 
+	var link = document.createTextNode(pem); 
 
 	// Append the text node to anchor element. 
 	a.appendChild(link);  
@@ -45,8 +58,8 @@ function createAnchor(data, callback){
 
     a.onclick = function(e){
         e.preventDefault();
-        console.log(data.slice(72,108));
-        callback(data);
+        console.log(pem.slice(72,108));
+        callback(pem);
     };
 
 	return a;

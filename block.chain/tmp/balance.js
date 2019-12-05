@@ -1,0 +1,107 @@
+
+
+var myutil = require('../util.js');
+var trans = require('./transac.js');
+
+
+function getBalanceFromLocalStore(){
+    var store = myutil.getLocalStore();
+    if (!store) return null;
+
+    var balanceStr = store.getItem('balance');
+    var balance = parseFloat(balanceStr);
+
+    return balance;
+}
+
+
+function setBalanceToLocalStore(ba){
+    var store = myutil.getLocalStore();
+    if (!store) return null;
+
+    store.setItem('balance', ba);
+    return ba;
+}
+
+function init(){
+    if(getBalanceFromLocalStore() == null){
+        setBalanceToLocalStore(0);
+    }
+}
+
+
+function transfer(payer_pem, payee_pem, amount, message=null){
+    var amount = parseFloat(message) || 0.0;
+    var data = {
+        amount: amount,
+        message: message
+    };
+
+    var tr = trans.makeTransaction(0, payer_pem, payee_pem, data);
+
+    var sig = forge.hashSign2Hex(key.privateKey, JSON.stringify(tr.extract()));
+    p(sig);
+
+    var before = getBalanceFromLocalStore();
+    var now    = before - amount;
+    setBalanceToLocalStore(now);
+
+    // save transaction to local store
+}
+
+
+function selfTransfer(myPem, amount, message){
+    var milli = Date.now();
+    var data = {
+        amount: amount,
+        message: message
+    };
+
+    var tr = trans.makeTransaction(milli, myPem, myPem, data);
+    //p(tr.print());
+
+
+    //var sig = forge.hashSign2Hex(key.privateKey, JSON.stringify(tr.extract()));
+
+    //tr.signatures.append({pem: myPem, sig: sig});
+    
+    return tr;
+}
+
+// function receive, reject, sync to server, server list 
+
+
+module.exports.getBalanceFromLocalStore = getBalanceFromLocalStore;
+module.exports.setBalanceToLocalStore   = setBalanceToLocalStore;
+module.exports.transfer   = transfer;
+module.exports.selfTransfer   = selfTransfer;
+
+
+if(typeof window === 'undefined'){
+    var forge = require('./forge.js');
+    var nforge = require('node-forge');
+
+    var kpi = nforge.kpi;
+
+    var p = console.log;
+
+    var k;
+
+    forge.genkey(function(err,key){
+        //p(key);
+
+        k = key;
+
+        
+        var trans = selfTransfer(key.pubpem, 38, 'test test'  );
+
+        var sig = forge.hashSign2Hex(key.privateKey, JSON.stringify(trans.extract()));
+        p(sig);
+        var veri = forge.hashVerify(key.publicKey, JSON.stringify(trans.extract()) , sig);
+        p(veri);
+        p( 
+            forge.hashVerify(key.publicKey, JSON.stringify(trans.extract()) + "." , sig)
+         );
+    });
+
+}

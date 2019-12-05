@@ -1,0 +1,55 @@
+
+<!DOCTYPE html>
+<html>
+    <body>
+
+        <h1>POPO MAP</h1>
+
+        <div id="googleMap" style="width:80%;height:400px;"></div>
+
+   <script>
+    const princeEdward = { lat: 22.32478, lng: 114.1683272};
+    const peLeft = { lat: 22.33478, lng: 114.1683272};
+    const hk = {lat: 22.28552, lng: 114.15769};  // Hong Kong
+
+    const japServer = {lat: 35.6761919, lng: 139.65031059999998};
+    const manhattan = {lat: 40.748  , lng: -73.988  };  // Manhattan
+
+    function myMap() {
+        var mapOpt= {
+            //center:new google.maps.LatLng(51.508742,-0.120850),  //Europe
+            //center:new google.maps.LatLng(22.28552, 114.15769),  // Hong Kong
+            center: princeEdward,
+            zoom:12,
+        };
+        var map = new google.maps.Map(document.getElementById("googleMap"),mapOpt);
+
+        //var marker = new google.maps.Marker({
+        //    position: princeEdward,
+        //    map: map,
+        //    title: 'Prince Edward'
+        //});
+        var popo = new google.maps.Marker({
+            position: peLeft,
+            map: map,
+            //icon: 'black.64.png',
+            icon: '32.popo.png',
+            draggable: true,
+            title: 'black popo'
+        });
+        var popo = new google.maps.Marker({
+            position: { lat: 22.33478, lng: 114.1783272},
+            map: map,
+            icon: '32.trex.png',
+            //icon: '32.popo.png',
+            title: '32 pixpopo'
+        });
+    }
+   </script>
+
+   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDiwbgt72z6fOBoM0AnngaWBmdtZd_7t-g&callback=myMap"></script>
+
+
+
+    </body>
+</html> 

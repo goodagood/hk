@@ -94,6 +94,21 @@ function storageAvailable(type) {
     }
 }
 
+
+function getLocalStore(){
+    const type = "localStorage";
+    if(storageAvailable(type)){
+        //p('available');
+        var store = window[type];
+        return store;
+    }else{
+        return null;
+    }
+}
+
+
 module.exports.showInfo = showInfo;
 module.exports.sliceObj = sliceObj;
 module.exports.post = post;
+module.exports.storageAvailable = storageAvailable;
+module.exports.getLocalStore = getLocalStore;

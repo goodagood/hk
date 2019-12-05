@@ -55,6 +55,7 @@ function post(data, url='/json', cb=console.log ){
         if (xhr.readyState === 4 && xhr.status === 200) 
         {
             console.log('xhr.responseText'); console.log(xhr.responseText);
+
             var jsonReply = JSON.parse(xhr.responseText);
             cb(jsonReply);
         }// do't do else
@@ -93,6 +94,21 @@ function storageAvailable(type) {
     }
 }
 
+
+function getLocalStore(){
+    const type = "localStorage";
+    if(myutil.storageAvailable(type)){
+        //p('available');
+        var store = window[type];
+        return store;
+    }else{
+        return null;
+    }
+}
+
+
 module.exports.showInfo = showInfo;
 module.exports.sliceObj = sliceObj;
 module.exports.post = post;
+module.exports.storageAvailable = storageAvailable;
+module.exports.getLocalStore = getLocalStore;
