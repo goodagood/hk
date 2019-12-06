@@ -57,6 +57,31 @@ function hashVerify(pubKey, text, signature){
     return pubKey.verify(md.digest().bytes(), sig);
 }
 
+function signTrans(key, transactionObj){
+
+    var sig = hashSign2Hex(key.privateKey, JSON.stringify(transactionObj.extract()));
+    transactionObj.signature.append(sig);
+
+    p(sig);
+    return sig;
+}
+
+function verifyTrans(transactionObj){
+    var pubpem = transactionObj.from;
+    var publicKey = forge.pki.publicKeyFromPem(publicKey);
+
+    var src = JSON.stringify(trans.extract());
+
+    var len = transactionObj.signature.length;
+    for(let i=0; i<len; i++){
+        var sig = transactionObj.signature[i];
+        var veri = hashVerify(key.publicKey, src, sig);
+        if(veri) { return 'yes, verified on ' + i.toString(); }
+    }
+
+    return false;
+}
+
 
 //
 
@@ -100,6 +125,7 @@ module.exports.hashSign2Hex = hashSign2Hex;
 module.exports.hashVerify = hashVerify;
 module.exports.fingerprint = fingerprint;
 module.exports.publicKeyFromPrivatePem = publicKeyFromPrivatePem;
+module.exports.verifyTrans = verifyTrans;
 
 /*
 if(window){

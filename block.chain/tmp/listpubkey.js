@@ -1,6 +1,9 @@
 
 
-var Vue = require("vue");
+//var Vue = require("vue");
+var _ = require("lodash");
+
+var forge = require('./forge.js');
 
 var p = console.log;
 
@@ -23,28 +26,34 @@ function insertInfo(infoDivID, k, callback){
 
 function buildPubpemClick(infoDivID, k, callback){
         var paragraph = document.createElement("p");
+        var pre = document.createElement("pre");
 
-        if(typeof k['_id'] !== 'undefined'){
-            paragraph.textContent += "id in db :" + k['_id'];
-        }
-        if(typeof k['milliseconds'] !== 'undefined'){
-            paragraph.textContent += "milli : " + k['milliseconds'];
-        }
+        var Obj = _.pick(k, ['milliseconds', '_id', 'name']);
 
-        p(k);
-        var a = createAnchor(k.pubpem, callback);
+        var finger = forge.fingerprint(k.pubpem);
+        p('finger : ', finger);
+
+        Obj['finger-print of public key'] = finger;
+        Obj.pubpem = k.pubpem.slice(0,128) + ' ...';
+        p(a);
+
+        var s = JSON.stringify(Obj, null, 4);
+        //p('str: ', s);
+        pre.textContent = s;
+
+        paragraph.appendChild(pre);
+        var a = createAnchor(k.pubpem, finger, callback);
         paragraph.appendChild(a);
-
         return paragraph;
 }
 
 
-function createAnchor(pem, callback){
+function createAnchor(pem, finger, callback){
 	// Create anchor element. 
 	var a = document.createElement('a');  
 
 	// Create the text node for anchor element. 
-	var link = document.createTextNode(pem); 
+	var link = document.createTextNode(finger); 
 
 	// Append the text node to anchor element. 
 	a.appendChild(link);  

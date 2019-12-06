@@ -3,11 +3,16 @@
 const forge = require('./forge.js');
 
 function makeTransaction (timestamp=null, payer=null, payee=null, data=null){
+    // payer => from, payee => to
+
     let obj = {};
     obj.payer = payer || 'payer pub key';
+    obj.from = payer || 'payer pub key';
+
     obj.payee = payee || 'payee pub key';
-    obj.fingerPayer = forge.fingerprint(payer) || 'payer pub key finger printer';
-    obj.fingerPayee = forge.fingerprint(payee) || 'payee pub key finger printer';
+    obj.to = payee || 'payee pub key';
+    obj['from-finger'] = forge.fingerprint(payer) || 'payer pub key finger printer';
+    obj['to-finger'] = forge.fingerprint(payee) || 'payee pub key finger printer';
 
     obj.timestamp = timestamp || new Date().getTime();
     obj.position = {payer: {lat:0, lng:0}, payee: {lat:0, lng:0}}; // position pair

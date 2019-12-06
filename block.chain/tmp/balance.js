@@ -78,7 +78,7 @@ module.exports.selfTransfer   = selfTransfer;
 
 
 if(typeof window === 'undefined'){
-    var forge = require('./forge.js');
+    var myforge = require('./forge.js');
     var nforge = require('node-forge');
 
     var kpi = nforge.kpi;
@@ -87,7 +87,7 @@ if(typeof window === 'undefined'){
 
     var k;
 
-    forge.genkey(function(err,key){
+    myforge.genkey(function(err,key){
         //p(key);
 
         k = key;
@@ -95,12 +95,12 @@ if(typeof window === 'undefined'){
         
         var trans = selfTransfer(key.pubpem, 38, 'test test'  );
 
-        var sig = forge.hashSign2Hex(key.privateKey, JSON.stringify(trans.extract()));
+        var sig = myforge.hashSign2Hex(key.privateKey, JSON.stringify(trans.extract()));
         p(sig);
-        var veri = forge.hashVerify(key.publicKey, JSON.stringify(trans.extract()) , sig);
+        var veri = myforge.hashVerify(key.publicKey, JSON.stringify(trans.extract()) , sig);
         p(veri);
         p( 
-            forge.hashVerify(key.publicKey, JSON.stringify(trans.extract()) + "." , sig)
+            myforge.hashVerify(key.publicKey, JSON.stringify(trans.extract()) + "." , sig)
          );
     });
 
