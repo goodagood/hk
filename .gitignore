@@ -1,3 +1,8 @@
+#vim back tmp file
+*~
+*swp
+*swo
+*.pyc
 #
 node_modules
 config.json

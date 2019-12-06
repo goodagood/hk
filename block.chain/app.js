@@ -21,6 +21,9 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "statics")));
 app.use(express.static('/my/outside'));
 
+var srvData = {};
+prepare(srvData);
+
 app.get('/', (req, res) => {
     console.log(req['headers']);
     res.send(getIP(req) + JSON.stringify(req['headers']))
@@ -56,5 +59,14 @@ function getIP(req){
     return ip;
 }
 
+
+function prepare(dataObj){
+    // prepare for server
+    db.insertSrvPem(function(err, serverKey){
+        if(err) {return p('insert srv pem err', err);}
+
+        dataObj['server.key'] = serverKey;
+    });
+}
 
 
