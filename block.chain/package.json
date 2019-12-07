@@ -16,6 +16,7 @@
     "jquery": "^3.4.1"
   },
   "devDependencies": {
+    "forerunnerdb": "^2.0.22",
     "nedb": "^1.8.0",
     "pug": "^2.0.4",
     "taffy": "^2.6.2"

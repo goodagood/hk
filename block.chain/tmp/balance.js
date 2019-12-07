@@ -2,6 +2,7 @@
 
 var myutil = require('../util.js');
 var trans = require('./transac.js');
+var forge = require('./forge.js');
 
 
 function getBalanceFromLocalStore(){
@@ -30,23 +31,21 @@ function init(){
 }
 
 
-function transfer(payer_pem, payee_pem, amount, message=null){
-    var amount = parseFloat(message) || 0.0;
-    var data = {
-        amount: amount,
-        message: message
-    };
-
-    var tr = trans.makeTransaction(0, payer_pem, payee_pem, data);
-
-    var sig = forge.hashSign2Hex(key.privateKey, JSON.stringify(tr.extract()));
-    p(sig);
+function signTransaction(privateKey, transaction ){
+    var amount = transaction.amount;
 
     var before = getBalanceFromLocalStore();
     var now    = before - amount;
     setBalanceToLocalStore(now);
 
-    // save transaction to local store
+    if(now <= 0.0){
+        transaction.negative = true;
+    }
+
+    var sig = forge.hashSign2Hex(privateKey, JSON.stringify(transaction.extract()));
+    transaction.signatures.push(sig);
+
+    return transaction;
 }
 
 
@@ -73,7 +72,7 @@ function selfTransfer(myPem, amount, message){
 
 module.exports.getBalanceFromLocalStore = getBalanceFromLocalStore;
 module.exports.setBalanceToLocalStore   = setBalanceToLocalStore;
-module.exports.transfer   = transfer;
+module.exports.signTransaction   = signTransaction;
 module.exports.selfTransfer   = selfTransfer;
 
 

@@ -1,16 +1,19 @@
 
 
+var _ = require('lodash');
+
 const forge = require('./forge.js');
 
 function makeTransaction (timestamp=null, payer=null, payee=null, data=null){
     // payer => from, payee => to
 
     let obj = {};
-    obj.payer = payer || 'payer pub key';
+    //obj.payer = payer || 'payer pub key';
     obj.from = payer || 'payer pub key';
 
-    obj.payee = payee || 'payee pub key';
+    //obj.payee = payee || 'payee pub key';
     obj.to = payee || 'payee pub key';
+
     obj['from-finger'] = forge.fingerprint(payer) || 'payer pub key finger printer';
     obj['to-finger'] = forge.fingerprint(payee) || 'payee pub key finger printer';
 
@@ -19,6 +22,8 @@ function makeTransaction (timestamp=null, payer=null, payee=null, data=null){
 
     obj.amount = 0 || data.amount; //'coins number';
     obj.cashUnit = 'HKD';
+
+    obj.negative = null;
 
     obj.randomNumber = 0;
 
@@ -44,17 +49,22 @@ function makeTransaction (timestamp=null, payer=null, payee=null, data=null){
     }
     
     obj.extract = function(){
-        var o = {};
-        o['timestamp']   = obj.timestamp;
-        o['amount']      = obj.amount;
-        o['unit']        = obj.unit;
-        o['payer']       = obj.payer;
-        o['payee']       = obj.payee;
-        o['data']        = obj.data;
-        o['talk']        = obj.talk;
-        o['position']    = obj.position;
+        var o = _.pick(obj, ['position', 'talk', 'data', 'timestamp',
+        'amount', 'unit', 'from', 'to', 'negative']);
+        //o['timestamp']   = obj.timestamp;
+        //o['amount']      = obj.amount;
+        //o['unit']        = obj.unit;
+        //o['payer']       = obj.payer;
+        //o['payee']       = obj.payee;
+        //o['data']        = obj.data;
+        //o['talk']        = obj.talk;
+        //o['position']    = obj.position;
         
         return o;
+    }
+
+    obj.dataOnly = function(){
+        return _.omit(obj, ['dataOnly', 'extract', 'print']);
     }
 
 

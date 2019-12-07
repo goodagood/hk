@@ -6,6 +6,13 @@
 
 var _ = require('lodash');
 
+//var Taffy = require('taffy');
+//var Taff= Taffy({'start.time': Date.now()}); // add an db for all data
+var Nedb = require('nedb/browser-version/out/nedb.min.js');
+var ndb = new Nedb();
+ndb.insert({a:1, b:2}, function(err){console.log('ndb err', err);});
+window.ndb = ndb;
+
 var forge = require('./forge.js');
 
 var myutil = require('../util.js');
@@ -36,7 +43,7 @@ localKeys.getKey(function(err, key){
     window.dat = Dat; window.fun = Fun; //debug
 
     // variables
-    var _payee;
+    var _payee, _transaction;
 
     window.key = key;
     Dat.privateKey = key.privateKey;
@@ -51,7 +58,7 @@ localKeys.getKey(function(err, key){
     map.fetchGoogleMapApi(function(){
         Dat['map.object']= map.createMap(document.getElementById("map"), 300, {});
         myutil.showInfo('info', 'Google Map API ready');
-        p('google map API ... fetchinged');
+        p('google map API ... fetched, bc3src');
     });
 
     function setPayee(pem){
@@ -61,23 +68,6 @@ localKeys.getKey(function(err, key){
     }
 
 
-    //moving to balance
-    function transfer(payer_pem, payee_pem, message=null){
-        if(!message){
-            message = document.getElementById('textBox').value || 'Money Silent';
-        }
-        var amount = parseFloat(message) || 0.0;
-        var data = {
-            amount: amount,
-            message: message
-        };
-
-        var tr = trans.makeTransaction(0, payer_pem, payee_pem, data);
-
-        //k1.privateKey.sign();
-        var sig = forge.hashSign2Hex(key.privateKey, JSON.stringify(tr.extract()));
-        p(sig);
-    }
 
     document.getElementById('newKey').onclick = function(e){
         // ?no delete the old pubkey
@@ -149,10 +139,24 @@ localKeys.getKey(function(err, key){
             listUserPem.listUserPem(jReply, 'info', setPayee);
         });
     };
-    document.getElementById('transaction').onclick = function(e){
-        if(_payee){
-            balance.transfer(0, key.pubpem, _payee, 'test debug');
+    document.getElementById('signTransaction').onclick = function(e){
+        if(_transaction){
+            var signed = balance.signTransaction(key.privateKey, _transaction);
+
+            var data = signed.dataOnly();
+            ndb.insert(data);
+            myutil.post(data, '/json',
+            function(jReply){
+                p('transaction post ed? ', jReply);
+            });
         }
+    };
+    document.getElementById('makeTransaction').onclick = function(e){
+        var message = document.getElementById('textBox').value || '0.0 Money Silent';
+        if(! _payee) { _payee = key.pubpem; }
+        _transaction = trans.makeTransaction(0, key.pubpem, _payee, message);
+        myutil.showInfo('info', JSON.stringify(_transaction, null, 4));
+        //p(_transaction);
     };
     document.getElementById('talk').onclick = function(e){
         talk.talk(e, Dat.pubpem, Dat['map.object']);
