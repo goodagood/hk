@@ -40,8 +40,8 @@ function setKeyPair(kp){
     var store = myutil.getLocalStore();
     if (!store) return null;
 
-    store.setItem('private.key.pem', kp.pubpem);
-    store.setItem('public.key.pem', kp.pripem);
+    store.setItem('private.key.pem', kp.pripem);
+    store.setItem('public.key.pem', kp.pubpem);
 }
 
 

@@ -145,11 +145,15 @@ localKeys.getKey(function(err, key){
 
             var data = signed.dataOnly();
             ndb.insert(data);
+            data['action'] = "broadcast transaction";
             myutil.post(data, '/json',
             function(jReply){
                 p('transaction post ed? ', jReply);
             });
         }
+    };
+    document.getElementById('showTransaction').onclick = function(e){
+        myutil.showInfo('info', JSON.stringify(_transaction, null, 4));
     };
     document.getElementById('makeTransaction').onclick = function(e){
         var message = document.getElementById('textBox').value || '0.0 Money Silent';

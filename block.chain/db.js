@@ -88,6 +88,9 @@ function addKV(json, callback){
     });
 }
 
+function saveTransaction(json, callback){
+    dbmem.insert(json, callback); 
+}
 
 const p = console.log;
 
@@ -97,6 +100,11 @@ const p = console.log;
 function jsonAction(json, callback){
     // json is an object, must has json['action']
 
+    if(typeof json['action'] == 'undefined'){
+        return callback({err: 'no action specified'});
+    }
+
+    
     if(json['action'] == 'find public keys'){ 
         return findPem(json, callback);
     };
@@ -106,6 +114,11 @@ function jsonAction(json, callback){
     if(json['action'] == 'add key value') { 
         return addKV(json, callback);
     };
+    if( json['action'] == "broadcast transaction" ) { 
+        //return saveTransaction(json, callback);
+        return dbmem.insert(json, callback); 
+    };
+            
 
     // must give a return
     return callback({err: 'do not know the action'});

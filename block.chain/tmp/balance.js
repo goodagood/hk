@@ -42,6 +42,7 @@ function signTransaction(privateKey, transaction ){
         transaction.negative = true;
     }
 
+    // transaction.dataOnly??
     var sig = forge.hashSign2Hex(privateKey, JSON.stringify(transaction.extract()));
     transaction.signatures.push(sig);
 
