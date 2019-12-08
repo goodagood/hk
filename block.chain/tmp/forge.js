@@ -119,6 +119,13 @@ function fingerprint(publicKey){
 }
 
 
+function calculateKey(o){
+    o.publicKey  = forge.pki.publicKeyFromPem(o.pubpem);
+    o.privateKey = forge.pki.privateKeyFromPem(o.pripem);
+    return o;
+}
+
+
 module.exports.sha256hex = sha256hex;
 module.exports.genkey = genkey;
 module.exports.hashSign2Hex = hashSign2Hex;
@@ -126,6 +133,7 @@ module.exports.hashVerify = hashVerify;
 module.exports.fingerprint = fingerprint;
 module.exports.publicKeyFromPrivatePem = publicKeyFromPrivatePem;
 module.exports.verifyTrans = verifyTrans;
+module.exports.calculateKey = calculateKey;
 
 /*
 if(window){

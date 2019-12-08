@@ -31,8 +31,7 @@ function getKeyPair(){
     var o = {};
     o.pripem = store.getItem('private.key.pem');
     o.pubpem = store.getItem('public.key.pem');
-
-    return o;
+    return forge.calculateKey(o);
 }
 
 
@@ -47,7 +46,7 @@ function setKeyPair(kp){
 
 function getKey(callback){
     var o = getKeyPair();
-    if(o.pripem && o.pubpem){
+    if(o.pripem && o.pubpem && o.privateKey){
         return callback(null, o);
     }
 

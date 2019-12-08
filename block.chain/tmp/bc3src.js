@@ -50,6 +50,7 @@ localKeys.getKey(function(err, key){
     Dat.publicKey  = key.publicKey;
     Dat.pripem = key.pripem;
     Dat.pubpem = key.pubpem;
+
     myutil.showInfo('info', Dat.pubpem);  // show public key in browser
 
     // init map
@@ -77,6 +78,7 @@ localKeys.getKey(function(err, key){
             Dat.pripem = key.pripem;
             Dat.pubpem = key.pubpem;
             localKeys.setKeyPair(key); // only pem
+            balance.setBalanceToLocalStore(0.0);
             myutil.showInfo('info', Dat.pubpem);
         })
     };
@@ -109,7 +111,9 @@ localKeys.getKey(function(err, key){
     };
     document.getElementById('balance').onclick = function(e){
         // check my balance
-        p('balance');
+        var ba = balance.getBalanceFromLocalStore();
+        myutil.showInfo('info', ba );
+        p('balance', ba);
     };
     document.getElementById('privateKey').onclick = function(e){
         myutil.showInfo('info', Dat.pripem );
@@ -142,10 +146,13 @@ localKeys.getKey(function(err, key){
     document.getElementById('signTransaction').onclick = function(e){
         if(_transaction){
             var signed = balance.signTransaction(key.privateKey, _transaction);
+            p('signed.signatures');
+            p(signed.signatures);
 
             var data = signed.dataOnly();
             ndb.insert(data);
             data['action'] = "broadcast transaction";
+
             myutil.post(data, '/json',
             function(jReply){
                 p('transaction post ed? ', jReply);

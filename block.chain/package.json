@@ -16,6 +16,8 @@
     "jquery": "^3.4.1"
   },
   "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babelify": "^10.0.0",
     "forerunnerdb": "^2.0.22",
     "nedb": "^1.8.0",
     "pug": "^2.0.4",
