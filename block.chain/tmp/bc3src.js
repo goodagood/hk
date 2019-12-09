@@ -72,12 +72,13 @@ localKeys.getKey(function(err, key){
 
     document.getElementById('newKey').onclick = function(e){
         // ?no delete the old pubkey
-        forge.genkey(function(err, key){
-            Dat.privateKey = key.privateKey;
-            Dat.publicKey  = key.publicKey;
-            Dat.pripem = key.pripem;
-            Dat.pubpem = key.pubpem;
-            localKeys.setKeyPair(key); // only pem
+        forge.genkey(function(err, k){
+            key = k;
+            Dat.privateKey = k.privateKey;
+            Dat.publicKey  = k.publicKey;
+            Dat.pripem = k.pripem;
+            Dat.pubpem = k.pubpem;
+            localKeys.setKeyPair(k); // only pem
             balance.setBalanceToLocalStore(0.0);
             myutil.showInfo('info', Dat.pubpem);
         })
@@ -136,36 +137,41 @@ localKeys.getKey(function(err, key){
             action: 'find public keys',
             pubpem: Dat.pubpem
         },
-        '/json',
-        function(jReply){
-            p('number of keys: ', Object.keys(jReply).length);
-            // list pem and make it clickable
-            listUserPem.listUserPem(jReply, 'info', setPayee);
-        });
-    };
-    document.getElementById('signTransaction').onclick = function(e){
-        if(_transaction){
-            var signed = balance.signTransaction(key.privateKey, _transaction);
-            p('signed.signatures');
-            p(signed.signatures);
-
-            var data = signed.dataOnly();
-            ndb.insert(data);
-            data['action'] = "broadcast transaction";
-
-            myutil.post(data, '/json',
+            '/json',
             function(jReply){
-                p('transaction post ed? ', jReply);
+                p('number of keys: ', Object.keys(jReply).length);
+                // list pem and make it clickable
+                listUserPem.listUserPem(jReply, 'info', setPayee);
             });
-        }
-    };
-    document.getElementById('showTransaction').onclick = function(e){
-        myutil.showInfo('info', JSON.stringify(_transaction, null, 4));
-    };
+        };
+        document.getElementById('signTransaction').onclick = function(e){
+            if(_transaction){
+                var signed = balance.signTransaction(Dat.privateKey, _transaction);
+                p('signed.signatures');
+                p(signed.signatures);
+
+                var data = signed.dataOnly();
+                ndb.insert(data);
+                data['action'] = "broadcast transaction";
+
+                myutil.post(data, '/json',
+                function(jReply){
+                    p('transaction post ed? ', jReply);
+                    // change balance
+                });
+            }
+        };
+        document.getElementById('showTransaction').onclick = function(e){
+            myutil.showInfo('info', JSON.stringify(_transaction, null, 4));
+        };
     document.getElementById('makeTransaction').onclick = function(e){
         var message = document.getElementById('textBox').value || '0.0 Money Silent';
-        if(! _payee) { _payee = key.pubpem; }
-        _transaction = trans.makeTransaction(0, key.pubpem, _payee, message);
+        if(! _payee) { _payee = Dat.pubpem; } // self trans
+        var data = {
+            amount: 0 || parseFloat(message),
+            message: message
+        };
+        _transaction = trans.makeTransaction(0, Dat.pubpem, _payee, data);
         myutil.showInfo('info', JSON.stringify(_transaction, null, 4));
         //p(_transaction);
     };

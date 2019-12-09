@@ -32,10 +32,11 @@ function init(){
 
 
 function signTransaction(privateKey, transaction ){
-    var amount = transaction.amount;
+    var amount = parseFloat(transaction.amount);
 
     var before = getBalanceFromLocalStore();
     var now    = before - amount;
+    console.log('set balance ', now);
     setBalanceToLocalStore(now);
 
     if(now <= 0.0){

@@ -6,11 +6,14 @@
 
 const _ = require('lodash');
 
+const p = console.log;
+
 // use NeDb as db
 const NEDB = require('nedb');
-// make an memory data store
-var dbmem = new NEDB({'inMemoryOnly':true});
-dbmem.loadDatabase((err)=>{'do nothing';});
+// change to file, from making an memory data store
+//var dbmem = new NEDB({'inMemoryOnly':true});
+var dbmem = new NEDB({filename: '/my/tmp/nedb'});
+dbmem.loadDatabase((err)=>{p('nedb load err: ', err);});
 
 // db keys: 
 //            'pubpem': pubpem,
@@ -33,7 +36,7 @@ function insertSrvPem(callback){
 
         var serverRecord = {
             'pubpem': pubpem,
-            'name': 'server',
+            'name': 'server-' + Date.now().toLocaleString(),
             'milliseconds': Date.now()
         }
 
@@ -92,7 +95,6 @@ function saveTransaction(json, callback){
     dbmem.insert(json, callback); 
 }
 
-const p = console.log;
 
 
 
