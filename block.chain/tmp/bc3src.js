@@ -50,6 +50,8 @@ localKeys.getKey(function(err, key){
     Dat.publicKey  = key.publicKey;
     Dat.pripem = key.pripem;
     Dat.pubpem = key.pubpem;
+    Dat.payee = null;
+    Dat.transaction = null;
 
     myutil.showInfo('info', Dat.pubpem);  // show public key in browser
 
@@ -173,10 +175,12 @@ localKeys.getKey(function(err, key){
         };
         _transaction = trans.makeTransaction(0, Dat.pubpem, _payee, data);
         myutil.showInfo('info', JSON.stringify(_transaction, null, 4));
-        //p(_transaction);
     };
     document.getElementById('talk').onclick = function(e){
         talk.talk(e, Dat.pubpem, Dat['map.object']);
+    }
+    document.getElementById('myFingerprint').onclick = function(e){
+        myutil.showInfo('info', forge.fingerprint(Dat.privateKey));
     }
     document.getElementById('mapup').onclick = function(e){
         var mapDiv = document.getElementById("map");
@@ -198,6 +202,11 @@ localKeys.getKey(function(err, key){
         var info = document.getElementById('info');
         info.insertBefore(mapDiv, info.firstChild);
     };
+    document.getElementById('encryptTo').onclick = function(e){
+        p('encry');
+        if(!_payee){return '';}
+        talk.encryptMsg(Dat, _payee); 
+    }
 });
 
 

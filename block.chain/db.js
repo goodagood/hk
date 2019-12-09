@@ -117,7 +117,9 @@ function jsonAction(json, callback){
         return addKV(json, callback);
     };
     if( json['action'] == "broadcast transaction" ) { 
-        //return saveTransaction(json, callback);
+        return dbmem.insert(json, callback); 
+    };
+    if( json['action'] == "talk" ) { 
         return dbmem.insert(json, callback); 
     };
             

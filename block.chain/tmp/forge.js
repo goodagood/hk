@@ -68,7 +68,7 @@ function signTrans(key, transactionObj){
 
 function verifyTrans(transactionObj){
     var pubpem = transactionObj.from;
-    var publicKey = forge.pki.publicKeyFromPem(publicKey);
+    var publicKey = forge.pki.publicKeyFromPem(pubpem);
 
     var src = JSON.stringify(trans.extract());
 
@@ -125,6 +125,44 @@ function calculateKey(o){
     return o;
 }
 
+function randomArray(len=10){
+    var a = [];
+    for(var i = 0; i < len; i++){
+        a.push(Math.random());
+    }
+    return a;
+}
+
+
+function talkEncrypt(privateKey, pubpem, msg){
+    // pubpem is receiver's pubpem
+
+    //var msg = {
+    //    text:   text,
+    //    pos:    pos
+    //    milli:  
+    //};
+
+    if(typeof msg.randomArray === 'undefined'){
+        p('random array');
+        msg.randomArray = randomArray();
+    }
+
+    var publicKey = forge.pki.publicKeyFromPem(pubpem);
+
+    var jstr = JSON.stringify(msg);
+    var encrypted = publicKey.encrypt(jstr);
+    var encode = forge.util.encode64(encrypted);
+    return encode;
+}
+
+function talkDecrypt(prikey, cryptoHex64){
+    var cryptoJstr = forge.util.decode64(cryptoHex64);
+    var jstr  = prikey.decrypt(cryptoJstr)
+    var msgObj = JSON.parse(jstr);
+    return msgObj;
+}
+
 
 module.exports.sha256hex = sha256hex;
 module.exports.genkey = genkey;
@@ -134,6 +172,8 @@ module.exports.fingerprint = fingerprint;
 module.exports.publicKeyFromPrivatePem = publicKeyFromPrivatePem;
 module.exports.verifyTrans = verifyTrans;
 module.exports.calculateKey = calculateKey;
+module.exports.talkEncrypt = talkEncrypt;
+module.exports.talkDecrypt = talkDecrypt;
 
 /*
 if(window){
