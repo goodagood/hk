@@ -11,9 +11,10 @@ var _ = require('lodash');
 var Nedb = require('nedb/browser-version/out/nedb.min.js');
 var ndb = new Nedb();
 ndb.insert({a:1, b:2}, function(err){console.log('ndb err', err);});
-window.ndb = ndb;
+//window.ndb = ndb;
 
 var forge = require('./forge.js');
+window.myforge = forge;
 
 var myutil = require('../util.js');
 var listUserPem = require('./listpubkey.js');
@@ -23,11 +24,12 @@ var localKeys = require('./getkey.js');
 var map = require('./map.js');
 
 var button = require('./button.js');
-var talk = require('./talk.js');
+var talk = require('./talk.js'); 
+window.talk = talk;
 var kv = require('./kvinput.js');
 
 var balance = require('./balance.js');
-window.ba = balance;
+//window.ba = balance;
 
 var p = console.log;
 
@@ -97,6 +99,7 @@ localKeys.getKey(function(err, key){
         _payee = null;
     };
     document.getElementById('keyValue').onclick = function(e){
+        e.preventDefault();
         kv.kvInput(function(err, k, v){
             p('back to callback');
             myutil.post({
@@ -203,9 +206,9 @@ localKeys.getKey(function(err, key){
         info.insertBefore(mapDiv, info.firstChild);
     };
     document.getElementById('encryptTo').onclick = function(e){
-        p('encry');
+        p('encry', Dat.payee);
         if(!_payee){return '';}
-        talk.encryptMsg(Dat, _payee); 
+        talk.encryptMsg(Dat, Dat.payee); 
     }
 });
 

@@ -122,10 +122,13 @@ function jsonAction(json, callback){
     if( json['action'] == "talk" ) { 
         return dbmem.insert(json, callback); 
     };
+    if( json['action'] == 'sym encrypted signed p2p msg' ) { 
+        return dbmem.insert(json, callback); 
+    };
             
 
     // must give a return
-    return callback({err: 'do not know the action'});
+    return callback(true, {err: 'do not know the action'});
 }
 
 

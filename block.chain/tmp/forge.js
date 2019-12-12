@@ -148,12 +148,44 @@ function talkEncrypt(privateKey, pubpem, msg){
         msg.randomArray = randomArray();
     }
 
-    var publicKey = forge.pki.publicKeyFromPem(pubpem);
+    var msgJson = JSON.stringify(msg);
+    //p(msg)
 
-    var jstr = JSON.stringify(msg);
-    var encrypted = publicKey.encrypt(jstr);
-    var encode = forge.util.encode64(encrypted);
-    return encode;
+    // generate a random key and IV
+    var symmetry = forge.random.getBytesSync(16);
+    var iv = forge.random.getBytesSync(8);
+
+    var cipher = forge.rc2.createEncryptionCipher(symmetry);
+    cipher.start(iv);
+    cipher.update(forge.util.createBuffer(msgJson));
+    cipher.finish();
+    var encrypted = cipher.output;
+    var hex = encrypted.toHex();
+
+    // outputs encrypted hex
+    console.log(hex.slice(0,128));
+
+    var symmetryHex = forge.util.encode64(symmetry);
+
+    var publicKey = forge.pki.publicKeyFromPem(pubpem);
+    p('pem ..');
+    // use public key to encrypt symmetryHex
+    var encryptedSym = publicKey.encrypt(symmetryHex);
+    var symEncrypt64 = forge.util.encode64(encryptedSym);
+
+    var sig = privateKey.sign(symEncrypt64);
+    var sigE64 = forge.util.encode64(sig);
+    p(`sig len ${sig.length}`);
+    p(sigE64);
+
+    return {
+        // msg json stringigy, symmetric encrypted, toHex
+        hex: hex,  
+        // symmetric key, public key encrypted, encode64
+        symmetricHex: symEncrypt64, 
+        //
+        sig64: sigE64
+    };
 }
 
 function talkDecrypt(prikey, cryptoHex64){
@@ -161,6 +193,20 @@ function talkDecrypt(prikey, cryptoHex64){
     var jstr  = prikey.decrypt(cryptoJstr)
     var msgObj = JSON.parse(jstr);
     return msgObj;
+}
+
+var quickEncrypt = require('quick-encrypt');
+function quickEncMsg(msg, pubpem){
+    //var publicKey = forge.pki.publicKeyFromPem(pubpem);
+    var msgJson = JSON.stringify(msg);
+    var cipherText = quickEncrypt.encrypt(msgJson, pubpem);
+    return cipherText;
+}
+
+// no test, 1210
+function quickDecMsg(cipherText, privateKey){
+    let decryptedText = quickEncrypt.decrypt( cipherText, privateKey);
+    return decryptedText;
 }
 
 
@@ -174,6 +220,8 @@ module.exports.verifyTrans = verifyTrans;
 module.exports.calculateKey = calculateKey;
 module.exports.talkEncrypt = talkEncrypt;
 module.exports.talkDecrypt = talkDecrypt;
+module.exports.quickEncMsg = quickEncMsg;
+module.exports.quickDecMsg = quickDecMsg;
 
 /*
 if(window){

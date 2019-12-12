@@ -3,6 +3,7 @@
 
 var myutil = require('../util.js');
 
+var forge = require('./forge.js');
 var map = require('./map.js');
 
 
@@ -45,6 +46,7 @@ function talk(e, pubpem, mapobj){
 }
 
 
+//var quickEncrypt = require('quick-encrypt');
 function encryptMsg(keys, toPubpem){
     var text = document.getElementById('textBox').value ;
     if(!text){
@@ -63,16 +65,25 @@ function encryptMsg(keys, toPubpem){
 
         };
 
-        var cryptographSignature = forge.talkEncrypt(keys.privateKey, toPubpem, msg)
+        //var cryptographSymSignature = forge.talkEncrypt(keys.privateKey, toPubpem, msg)
         //
         //{
         //    cryptograph: hex64-encoded-encrypted,
         //    signature: sig
         //}
 
+
+        //var publicKey = forge.pki.publicKeyFromPem(toPubpem);
+        //var msgJson = JSON.stringify(msg);
+        //var cipherText = quickEncrypt.encrypt(msgJson, publicKey);
+
+        var cipherText = forge.quickEncMsg(msg, toPubpem);
+
+
+        
         myutil.post({
-            action: 'encrypted signed p2p msg',
-            cs:   cryptographSignature,
+            action: 'sym encrypted signed p2p msg',
+            cipherText:   cipherText,
 
             to:   toPubpem,
             from: keys.pubpem
@@ -82,8 +93,10 @@ function encryptMsg(keys, toPubpem){
             p(jReply);
         });
 
-        myutil.showInfo('info', 'encry.. message send out to srv: ' + 
-                JSON.stringify(cryptographSignature));
+        myutil.showInfo('info', 
+                `encry.. message send out to srv:  
+                ${cipherText.slice(0,38)} ... ${cipherText.length}
+                `);
 
     });
 }

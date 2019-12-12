@@ -29,8 +29,10 @@ function kvInput(callback){
         var val = kvElement.find('.value').first().val();
         callback(null, key, val);
     });
+
     
     kvElement.prependTo("#info");
+    kvElement.find('.key').first().focus();
 }
 
 
