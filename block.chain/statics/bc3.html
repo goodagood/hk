@@ -1,4 +1,4 @@
-<!DOCTYPE HTML>
+<!doctype html>
 <html lang="en">
 <!-- 
   get payee pub key, talk with payee, sign the transaction
@@ -14,11 +14,12 @@
 <head>
 <meta http-equiv="content-type" content="text/html" />
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 <meta name="author"   content="Andrew">
 
-<link rel="shortcut icon" type="image/x-icon" href="./favicon.ico" />
+<link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.css" />
+<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
 
 <!--
 <link rel="stylesheet" type="text/css" href="./bc.css" >
@@ -38,7 +39,12 @@ button {
   min-width:65%;
   font-size:24px;
 }
-#map { height:350px; }
+
+#map { 
+height:350px; 
+
+box-sizing: content-box; // might be good for bootstrap
+}
 
 </style>
 
