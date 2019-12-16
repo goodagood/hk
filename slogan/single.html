@@ -2,6 +2,8 @@
 <html lang="en">
 <!-- 
   Enter slogans and set color and size
+
+<link rel="stylesheet" type="text/css" href="./single.css" >
 -->
 <head>
 <meta http-equiv="content-type" content="text/html" />
@@ -16,21 +18,11 @@
 
 <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico" />
 
-<link rel="stylesheet" type="text/css" href="./single.css" >
-
+<link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style type="text/css">
-form {
-  /*background-color: #F5F5F5;*/
-  font-size:24px;
-}
-form #textInput{
-  min-width:65%;
-  font-size:24px;
-}
-
-#slogan {
-  margin-top: 18px;
+body #slogan p {
+  padding:5px;
 }
 </style>
 
@@ -41,7 +33,7 @@ form #textInput{
 
 
 <title> 
-    Color and Size
+    Slogan Talk
 </title>
 
 
@@ -49,40 +41,34 @@ form #textInput{
 
 <body>
 
+<div class="container-fluid"> <!-- give it to bootstrap -->
 
-<nav id="ooofix-top">
+
+<nav id="ooofix-top" class="row">
   <div class="topnav" id="control-color-size">
-    <a href="." id="randomColor">Color</a>
-    <a href="." id="textColor" class="opt">Text</a>
-    <a href="." id="increaseBodyFontSize" > Z++ </a>
-    <a href="." id="decreaseBodyFontSize" > z-- </a>
+    <button href="#oonav" class="btn" id="randomColor">Color</button>
+    <button href="#oonav" class="btn" id="textColor" class="opt">Text</button>
+    <button href="#oonav" class="btn" id="increaseBodyFontSize" > Z++ </button>
+    <button href="#oonav" class="btn" id="decreaseBodyFontSize" > z-- </button>
   </div>
 </nav>
 
+<form>
+    <input type="text" id="textInput" class="form-control" 
+     placeholder="POPO means Hong Kong Riot Police" onfocus="this.placeholder=''" />
+    <input type=SUBMIT value=YES id="yes"  class="btn btn-success" />
+</form>
 
+<div id="slogan" class="row">
+  <p> 5 Demands, Not 1 Less </p>
+  <p> POPO GO HELL       </p>
+  <p> DLLM Sir! </p>
+  <p> 仗义多为屠狗辈 </p>
+  <p> 仗義多為屠狗輩 </p>
+  <p> POPO 愛 校長 </p>
+  <p> Fight for freedom, Stand with Hong Kong </p>
+</div>
 
-<div id="wrapper" >
-
-  <br class="clear-fix" />
-  <form>
-      <input type="text" id="textInput" 
-       placeholder="POPO eats dog food" onfocus="this.placeholder=''" />
-      <input type=SUBMIT value=YES id="yes" />
-  </form>
-  <br class="clear-fix" />
-
-  <div id="slogan" >
-    <p> 5 Demands, Not 1 Less </p>
-    <p> POPO GO HELL       </p>
-    <p> 仗义多为屠狗辈 </p>
-    <p> 仗義多為屠狗輩 </p>
-    <p> POPO 愛 校長 </p>
-    <p> Senates kowtow CCP </p>
-    <p> DLLM Sir, POPO Smile! </p>
-    <p> Fight for freedom, Stand with Hong Kong </p>
-  </div>
-
-</div> <!-- end of wrapper -->
 
 <div class="clear-fix"></div>
 <footer>
@@ -92,6 +78,7 @@ form #textInput{
   <div id="debugInfo"> </div>
 </footer>
 
+</div> <!-- end bootstrap container -->
 
 <script src="./single.js"></script>
 <script >

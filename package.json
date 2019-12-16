@@ -50,5 +50,7 @@
     "sqlite3": "^4.1.0",
     "supertest": "^4.0.0"
   },
-  "browser": {"Vue": "vue/dist/vue.common.js"}
+  "browser": {
+    "Vue": "vue/dist/vue.common.js"
+  }
 }

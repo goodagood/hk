@@ -6,7 +6,11 @@
   "main": "app.js",
   "scripts": {
     "start": "nodemon app.js",
-    "test": "nodemon app.js"
+    "test": "nodemon app.js",
+
+    "2019 12 16 build": "npx browserify single.src.js -o  dist/single.js",
+    "build": "npx webpack --config webpack.config.js",
+    "what": "webpack, grunt, ..."
   },
   "keywords": [
     "slogan",
@@ -17,6 +21,7 @@
   "author": "andrew",
   "license": "ISC",
   "dependencies": {
+    "bootstrap": "^3.4.1",
     "browserify": "^16.5.0",
     "color": "^3.1.2",
     "cookie": "^0.4.0",
