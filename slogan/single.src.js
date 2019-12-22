@@ -11,6 +11,7 @@ const p = console.log;
 document.getElementById('randomColor').onclick = function(e){
     if(e) e.preventDefault();
     pcolor.randomBodyColor();
+    //pcolor.randomDivColor('slogan');
 };
 document.getElementById('textColor').onclick = function(e){
     if(e) e.preventDefault();

@@ -110,6 +110,29 @@ function rollBodyForeground(){
     bodyColor(f.hex(), b.hex());
 }
 
+
+function adjustDivTextColor(divId){
+    var r = 4.5;
+
+    //var fore = document.body.style.color;
+    var el = document.getElementById(divId);
+    var back = el.style.backgroundColor;
+
+    var f = randomColor(), b = Color(back);
+
+    var ratio = f.contrast(b);
+    console.log(`ratio < r ? ${ratio} < ${r}`);
+    while(ratio < r){
+        f = randomColor();
+        ratio = f.contrast(b);
+    }
+
+    console.log(f.hex(), b.hex(), ratio);
+
+    //bodyColor(f.hex(), b.hex());
+    divColor(divId, f.hex(), b.hex());
+}
+
 //document.getElementById('randombodycolor').onclick = randomBodyColor;
 //document.getElementById('redoColor').onclick = redoColor;
 //document.getElementById('rollBodyForeground').onclick = rollBodyForeground;
@@ -124,6 +147,7 @@ module.exports.bodyColor = bodyColor;
 module.exports.randomBodyColor = randomBodyColor;
 module.exports.rollBodyForeground = rollBodyForeground;
 module.exports.randomDivColor = randomDivColor;
+module.exports.adjustDivTextColor = adjustDivTextColor;
 
 //debug
 window.randomDivColor = randomDivColor;
