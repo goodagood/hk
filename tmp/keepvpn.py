@@ -56,17 +56,20 @@ def keep():
         out  = proc.stdout.decode('utf-8')
         print('status stdout:\r\n', out)
 
-        for s in ok:
-            if(out.startswith(s.strip())):
-                print('...sleep, got status: ', s)
+        connect_needed = True
+        for good_condition in ok:
+            if out.count(good_condition):
+                print('...python time.sleep, got status: ', good_condition)
                 time.sleep(60)
+                connect_needed = False
                 continue
 
 
-        print("run: ", VpnConnect)
-        again = sb.run(VpnConnect, stdout=sb.PIPE, shell=True)
-        print(again.stdout.decode('utf-8'))
-        time.sleep(60)
+        if connect_needed:
+            print("run: ", VpnConnect)
+            again = sb.run(VpnConnect, stdout=sb.PIPE, shell=True)
+            print(again.stdout.decode('utf-8'))
+            time.sleep(60)
 
         if limitMinute(maxMinutes):
             break
