@@ -9,7 +9,7 @@ import time
 import threading # plan to use
 
 
-maxMinutes  = 666 # in minutes
+maxMinutes  = 6666 # in minutes
 
 cmd_connect = ['expressvpn', 'connect']
 cmd_off     = ['expressvpn', 'disconnect']
@@ -59,7 +59,10 @@ def keep():
         connect_needed = True
         for good_condition in ok:
             if out.count(good_condition):
-                print('...python time.sleep, got status: ', good_condition)
+                print('...python time.sleep, got status: ',
+                        good_condition,
+                        time.ctime())
+
                 time.sleep(60)
                 connect_needed = False
                 continue
