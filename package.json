@@ -31,7 +31,7 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "js-sha256": "^0.9.0",
     "lodash": "^4.17.15",
     "socket.io": "^2.3.0",
