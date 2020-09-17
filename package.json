@@ -44,7 +44,7 @@
     "cryptico": "^1.0.2",
     "keypair": "^1.0.1",
     "load-google-maps-api": "^2.0.1",
-    "node-forge": "^0.9.1",
+    "node-forge": "^0.10.0",
     "scriptjs": "^2.5.9",
     "socket.io-client": "^2.3.0",
     "sqlite3": "^4.1.0",
